@@ -1,0 +1,30 @@
+{
+  "name": "d3.chart.layout",
+  "description": "Reusable D3.layouts built with d3.chart",
+  "homepage": "https://github.com/bansaghi/d3.chart.layout/",
+  "version": "0.1.0",
+  "author": "Anna Bansaghi",
+  "license": "BSD license",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bansaghi/d3.chart.layout.git"
+  },
+  "keywords": [
+    "d3.js",
+    "visualization",
+    "svg"
+  ],
+  "d3.chart": {
+    "version": "0.2.1"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.5.1",
+    "grunt-contrib-watch": "^0.6.1"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.0"
+  }
+}

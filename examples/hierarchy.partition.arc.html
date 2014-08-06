@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Arc Partition Example</title>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../lib/d3.chart.min.js"></script>
+    <script src="../d3.chart.layout.hierarchy.min.js"></script>
+    <style>
+      html {
+        display: table;
+        margin: auto; }
+
+      #vis {
+        width: 960px;
+        height: 1000px; }
+
+      path {
+        stroke: #fff;
+        fill-rule: evenodd; }
+    </style>
+  </head>
+  <body>
+
+    <div id="vis"></div>
+
+    <script>
+      (function() {
+        d3.json("data/flare.json", function(error, json) {
+          createDiagram(json);
+        });
+
+        function createDiagram(data) {
+          var partition = d3.select("#vis")
+            .append("svg")
+            .chart("partition.arc")
+              .value("size")
+              //.diameter(200)
+              //.zoomable([1, 5])
+              .collapsible()
+              //.duration(200)
+              ;
+
+          partition.draw(data);
+        }
+      }());
+    </script>
+  </body>
+</html>
