@@ -40,12 +40,29 @@ d3.chart("hierarchy").extend("treemap", {
             .attr("text-anchor", "middle")
             .text(function(d) { return d.children ? null : d[chart._name]; }) // order is matter! getComputedTextLength
             .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; });
+
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         },
       }
     });
   },
-
-
 
 
   transform: function(root) {
@@ -70,10 +87,10 @@ d3.chart("hierarchy").extend("treemap", {
 
     chart.layers.base.on("merge", function() {
       node = chart.root;
-      this.on("click", function(d) { collapse(node == d.parent ? chart.root : d.parent); });
+      chart.on("singleClick", function(d) { collapse(node == d.parent ? chart.root : d.parent); });
     });
 
-    d3.select(window).on("click", function() { collapse(chart.root); });
+    chart.base.on("click", function() { collapse(chart.root); });
 
 
     function collapse(d) {
@@ -99,11 +116,11 @@ d3.chart("hierarchy").extend("treemap", {
         .style("opacity", function(d) { return kx * d.dx > d.w ? 1 : 0; });
 
       node = d;
-      d3.event.stopPropagation();
     }
 
-  return this;
-  }
+    return this;
+  },
+
 });
 
 

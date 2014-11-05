@@ -38,13 +38,34 @@ d3.chart("hierarchy").extend("cluster-tree", {
             .attr("dy", ".35em")
             .text(function(d) { return d[chart._name]; })
             .style("fill-opacity", 0);
+
+          // http://stackoverflow.com/questions/1067464/need-to-cancel-click-mouseup-events-when-double-click-event-detected/1067484#1067484
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         },
 
         "merge:transition": function() {
           this.select("circle")
             .attr("r", chart._radius)
-            .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-
+            .style("stroke", function(d) { return d.path ? "brown" : "steelblue"; })
+            .style("fill", function(d) { return d.path && ! d.parent.path ? "#E2A76F"
+                                                                          : d._children ? "lightsteelblue" : "#fff"; });
           this.select("text")
             .style("fill-opacity", 1);
         },
@@ -85,7 +106,9 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
         "merge:transition": function() {
           this.duration(chart._duration)
-            .attr("d", chart.d3.diagonal);
+            .attr("d", chart.d3.diagonal)
+            .attr("stroke", function(d) { return d.source.path && d.target.path ? "#dd7b7b" : "#ccc"; })
+            .style("stroke-width", function(d) { return d.path ? 1 : 1.5; });
         },
 
         "exit:transition": function() {
@@ -120,23 +143,17 @@ d3.chart("hierarchy").extend("cluster-tree", {
   collapsible: function() {
     var chart = this;
 
-    chart.layers.nodes.on("merge", function() {
-      this.on("click", click);
-    });
-
     chart.once("collapse:init", function() {
       chart.root.children.forEach(collapse);
     });
 
 
-    function click(d) {
-      if (d3.event.defaultPrevented) {
-        return;
-      }
+    chart.on("singleClick", function(d) {
       d = toggle(d);
       chart.trigger("transform:stash");
       chart.draw(d);
-    }
+    });
+
 
     function toggle(d) {
       if (d.children) {
@@ -158,7 +175,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
     }
 
     return this;
-  }
+  },
+
 });
 
 

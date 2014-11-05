@@ -32,28 +32,41 @@ d3.chart("hierarchy").extend("pack.flattened", {
       },
 
       events: {
-        enter: function() {
+        "enter": function() {
 
           this.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
           this.append("circle")
-            .attr("r", function(d) { return d.r; });
+            .attr("r", function(d) { return d.r; })
+            .style("stroke", "#aaa")
+            .style("fill", chart._formats.fill);
 
           this.append("text")
             .attr("dy", ".3em")
-            .style("text-anchor", "middle");
-        },
-
-        merge: function() {
-
-          this.select("text")
+            .style("text-anchor", "middle")
             .text(function(d) { return d[chart._name].substring(0, d.r / 3); });
 
           this.append("title")
             .text(chart._formats.title);
 
-          this.select("circle")
-            .style("fill", chart._formats.fill);
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         },
       }
     });
@@ -135,6 +148,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
     return this;
   },
+
 });
 
 

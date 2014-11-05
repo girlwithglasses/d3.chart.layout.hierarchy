@@ -1,4 +1,4 @@
-/*! d3.chart.layout - v0.1.0
+/*! d3.chart.layout - v0.1.1
  *  https://github.com/bansaghi/d3.chart.layout/
  *  
  *  Copyright (c) 2014 Anna Bansaghi
@@ -9,8 +9,8 @@ d3.chart("hierarchy", {
 
   initialize: function() {
 
-    this.d3     = {};
-    this.layers = {};
+    this.d3      = {};
+    this.layers  = {};
 
     this.base.attr("width",  this.base.node().parentNode.clientWidth);
     this.base.attr("height", this.base.node().parentNode.clientHeight);
@@ -19,10 +19,17 @@ d3.chart("hierarchy", {
     this.layers.base = this.base.append("g");
     
     this.name(this._name         || "name");
-    this.value(this._value     || "value");
+    this.value(this._value       || "value");
     this.duration(this._duration || 750);
+
   },
 
+
+
+
+  transform: function(root) {
+    return root;
+  },
 
 
   name: function(_) {
@@ -131,13 +138,34 @@ d3.chart("hierarchy").extend("cluster-tree", {
             .attr("dy", ".35em")
             .text(function(d) { return d[chart._name]; })
             .style("fill-opacity", 0);
+
+          // http://stackoverflow.com/questions/1067464/need-to-cancel-click-mouseup-events-when-double-click-event-detected/1067484#1067484
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         },
 
         "merge:transition": function() {
           this.select("circle")
             .attr("r", chart._radius)
-            .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-
+            .style("stroke", function(d) { return d.path ? "brown" : "steelblue"; })
+            .style("fill", function(d) { return d.path && ! d.parent.path ? "#E2A76F"
+                                                                          : d._children ? "lightsteelblue" : "#fff"; });
           this.select("text")
             .style("fill-opacity", 1);
         },
@@ -178,7 +206,9 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
         "merge:transition": function() {
           this.duration(chart._duration)
-            .attr("d", chart.d3.diagonal);
+            .attr("d", chart.d3.diagonal)
+            .attr("stroke", function(d) { return d.source.path && d.target.path ? "#dd7b7b" : "#ccc"; })
+            .style("stroke-width", function(d) { return d.path ? 1 : 1.5; });
         },
 
         "exit:transition": function() {
@@ -213,23 +243,17 @@ d3.chart("hierarchy").extend("cluster-tree", {
   collapsible: function() {
     var chart = this;
 
-    chart.layers.nodes.on("merge", function() {
-      this.on("click", click);
-    });
-
     chart.once("collapse:init", function() {
       chart.root.children.forEach(collapse);
     });
 
 
-    function click(d) {
-      if (d3.event.defaultPrevented) {
-        return;
-      }
+    chart.on("singleClick", function(d) {
       d = toggle(d);
       chart.trigger("transform:stash");
       chart.draw(d);
-    }
+    });
+
 
     function toggle(d) {
       if (d.children) {
@@ -251,7 +275,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
     }
 
     return this;
-  }
+  },
+
 });
 
 
@@ -298,19 +323,24 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
 
   transform: function(root) {
-
-    var chart = this;
+    var chart = this,
+        nodes;
     chart.source = root;
 
     if ( ! chart.root) {
       chart.root    = root;
       chart.root.x0 = chart._height / 2;
       chart.root.y0 = 0;
+
+      nodes = chart.d3.layout
+        .size([chart._height, chart._width])
+        .nodes(chart.root); // workaround for getting correct chart.root to transform method in hierarchy.js
+
       chart.trigger("collapse:init");
     }
 
-    var nodes = chart.d3.layout
-      .size([chart._height, chart._width])
+    nodes = chart.d3.layout
+      //.size([chart._height, chart._width])
       .nodes(chart.root).reverse();
 
 //    nodes.forEach(function(d) { d.y = d.depth * 180; });
@@ -386,20 +416,24 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
 
 
   transform: function(root) {
-    var chart = this;
+    var chart = this,
+        nodes;
     chart.source = root;
 
     if ( ! chart.root) {
       chart.root    = root;
       chart.root.x0 = 360;
       chart.root.y0 = 0;
+
+      nodes = chart.d3.layout
+        .size([360, chart._diameter / 4])
+        .separation(function(a, b) { if (a.depth === 0) { return 1; } else { return (a.parent == b.parent ? 1 : 2) / a.depth; }}) // workaround
+        .nodes(chart.root);
+
       chart.trigger("collapse:init");
     }
 
-    var nodes = chart.d3.layout
-      .size([360, chart._diameter / 4])
-      .separation(function(a, b) { if (a.depth === 0) { return 1; } else { return (a.parent == b.parent ? 1 : 2) / a.depth; }}) // workaround
-      .nodes(chart.root).reverse();
+    nodes = chart.d3.layout.nodes(chart.root).reverse();
 
     //nodes.forEach(function(d) { d.y = d.depth * 180; });
 
@@ -482,28 +516,41 @@ d3.chart("hierarchy").extend("pack.flattened", {
       },
 
       events: {
-        enter: function() {
+        "enter": function() {
 
           this.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
           this.append("circle")
-            .attr("r", function(d) { return d.r; });
+            .attr("r", function(d) { return d.r; })
+            .style("stroke", "#aaa")
+            .style("fill", chart._formats.fill);
 
           this.append("text")
             .attr("dy", ".3em")
-            .style("text-anchor", "middle");
-        },
-
-        merge: function() {
-
-          this.select("text")
+            .style("text-anchor", "middle")
             .text(function(d) { return d[chart._name].substring(0, d.r / 3); });
 
           this.append("title")
             .text(chart._formats.title);
 
-          this.select("circle")
-            .style("fill", chart._formats.fill);
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         },
       }
     });
@@ -585,6 +632,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
     return this;
   },
+
 });
 
 
@@ -629,6 +677,25 @@ d3.chart("hierarchy").extend("pack.nested", {
           this.append("text")
             .attr("dy", ".3em")
             .style("text-anchor", "middle");
+
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         },
 
         merge: function() {
@@ -680,16 +747,18 @@ d3.chart("hierarchy").extend("pack.nested", {
   collapsible: function() {
     var chart = this;
 
-    var node;
-    var x = d3.scale.linear().range([0, chart._diameter]),
+    var node,
+        x = d3.scale.linear().range([0, chart._diameter]),
         y = d3.scale.linear().range([0, chart._diameter]);
+
 
     chart.layers.base.on("merge", function() {
       node = chart.root;
-      this.on("click", function(d) { collapse(node == d ? chart.root : d); });
+      chart.on("singleClick", function(d) { collapse(node == d ? chart.root : d); });
     });
 
-    d3.select(window).on("click", function() { collapse(chart.root); });
+    chart.base.on("click", function() { collapse(chart.root); });
+//    d3.select(window).on("click", function() { collapse(chart.root); });
 
 
     function collapse(d) {
@@ -711,11 +780,12 @@ d3.chart("hierarchy").extend("pack.nested", {
         .style("opacity", function(d) { return k * d.r > 20 ? 1 : 0; });
 
       node = d;
-      d3.event.stopPropagation();
     }
 
     return this;
   },
+
+
 });
 
 
@@ -735,7 +805,7 @@ d3.chart("hierarchy").extend("partition.arc", {
     chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
 
 
-    var color      = d3.scale.category20c();
+    chart.d3.color = d3.scale.category20c();
     chart.d3.x     = d3.scale.linear().range([0, 2 * Math.PI]);
     chart.d3.y     = d3.scale.sqrt().range([0, chart._diameter / 2]);
     chart.d3.arc   = d3.svg.arc()
@@ -764,7 +834,26 @@ d3.chart("hierarchy").extend("partition.arc", {
       events: {
         enter: function() {
           this.attr("d", chart.d3.arc)
-            .style("fill", function(d) { return color((d.children ? d : d.parent)[chart._name]); });
+            .style("fill", function(d) { return chart.d3.color((d.children ? d : d.parent)[chart._name]); });
+
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         }
       }
     });
@@ -810,7 +899,7 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.layers.base.on("merge", function() {
       var path = this;
-      this.on("click", function(d) {
+      chart.on("singleClick", function(d) {
           path.transition()
             .duration(chart._duration)
             .attrTween("d", arcTween(d));
@@ -829,6 +918,7 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     return this;
   },
+
 });
 
 
@@ -879,6 +969,25 @@ d3.chart("hierarchy").extend("partition.rectangle", {
             .attr("dy", ".35em")
             .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; })
             .text(function(d) { return d[chart._name]; });
+
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         }
       }
     });
@@ -899,21 +1008,19 @@ d3.chart("hierarchy").extend("partition.rectangle", {
   collapsible: function() {
     var chart = this;
 
-    var x = d3.scale.linear(),
+    var node,
+        x = d3.scale.linear(),
         y = d3.scale.linear().range([0, chart._height]);
 
     chart.layers.base.on("merge", function() {
-      this.on("click", collapse);
+      node = chart.root;
+      chart.on("singleClick", function(d) { collapse(node == d ? chart.root : d); });
     });
 
-    d3.select(window).on("click", function() { collapse(chart.root); });
+    chart.base.on("click", function() { collapse(chart.root); });
 
 
     function collapse(d) {
-      if ( ! d.children) {
-        return;
-      }
-
       var kx = (d.y ? chart._width - 40 : chart._width) / (1 - d.y),
           ky = chart._height / d.dx;
 
@@ -934,11 +1041,12 @@ d3.chart("hierarchy").extend("partition.rectangle", {
         .attr("transform", function(d) { return chart.d3.transform(d, ky); })
         .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; });
 
-      d3.event.stopPropagation();
+      node = d;
     }
   
     return this;
   },
+
 });
 
 
@@ -1000,12 +1108,29 @@ d3.chart("hierarchy").extend("treemap", {
             .attr("text-anchor", "middle")
             .text(function(d) { return d.children ? null : d[chart._name]; }) // order is matter! getComputedTextLength
             .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; });
+
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         },
       }
     });
   },
-
-
 
 
   transform: function(root) {
@@ -1030,10 +1155,10 @@ d3.chart("hierarchy").extend("treemap", {
 
     chart.layers.base.on("merge", function() {
       node = chart.root;
-      this.on("click", function(d) { collapse(node == d.parent ? chart.root : d.parent); });
+      chart.on("singleClick", function(d) { collapse(node == d.parent ? chart.root : d.parent); });
     });
 
-    d3.select(window).on("click", function() { collapse(chart.root); });
+    chart.base.on("click", function() { collapse(chart.root); });
 
 
     function collapse(d) {
@@ -1059,11 +1184,11 @@ d3.chart("hierarchy").extend("treemap", {
         .style("opacity", function(d) { return kx * d.dx > d.w ? 1 : 0; });
 
       node = d;
-      d3.event.stopPropagation();
     }
 
-  return this;
-  }
+    return this;
+  },
+
 });
 
 

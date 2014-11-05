@@ -45,6 +45,25 @@ d3.chart("hierarchy").extend("partition.rectangle", {
             .attr("dy", ".35em")
             .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; })
             .text(function(d) { return d[chart._name]; });
+
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         }
       }
     });
@@ -65,21 +84,19 @@ d3.chart("hierarchy").extend("partition.rectangle", {
   collapsible: function() {
     var chart = this;
 
-    var x = d3.scale.linear(),
+    var node,
+        x = d3.scale.linear(),
         y = d3.scale.linear().range([0, chart._height]);
 
     chart.layers.base.on("merge", function() {
-      this.on("click", collapse);
+      node = chart.root;
+      chart.on("singleClick", function(d) { collapse(node == d ? chart.root : d); });
     });
 
-    d3.select(window).on("click", function() { collapse(chart.root); });
+    chart.base.on("click", function() { collapse(chart.root); });
 
 
     function collapse(d) {
-      if ( ! d.children) {
-        return;
-      }
-
       var kx = (d.y ? chart._width - 40 : chart._width) / (1 - d.y),
           ky = chart._height / d.dx;
 
@@ -100,10 +117,11 @@ d3.chart("hierarchy").extend("partition.rectangle", {
         .attr("transform", function(d) { return chart.d3.transform(d, ky); })
         .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; });
 
-      d3.event.stopPropagation();
+      node = d;
     }
   
     return this;
   },
+
 });
 

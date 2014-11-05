@@ -40,19 +40,24 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
 
   transform: function(root) {
-
-    var chart = this;
+    var chart = this,
+        nodes;
     chart.source = root;
 
     if ( ! chart.root) {
       chart.root    = root;
       chart.root.x0 = chart._height / 2;
       chart.root.y0 = 0;
+
+      nodes = chart.d3.layout
+        .size([chart._height, chart._width])
+        .nodes(chart.root); // workaround for getting correct chart.root to transform method in hierarchy.js
+
       chart.trigger("collapse:init");
     }
 
-    var nodes = chart.d3.layout
-      .size([chart._height, chart._width])
+    nodes = chart.d3.layout
+      //.size([chart._height, chart._width])
       .nodes(chart.root).reverse();
 
 //    nodes.forEach(function(d) { d.y = d.depth * 180; });

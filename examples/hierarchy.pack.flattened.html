@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <title>Flattened Pack Example</title>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="../lib/d3.chart.js"></script>
+    <script src="../lib/d3.min.js"></script>
+    <script src="../lib/d3.chart.min.js"></script>
     <script src="../d3.chart.layout.hierarchy.js"></script>
     <style>
       html {
@@ -17,26 +17,6 @@
 
       text {
         font: 12px sans-serif;
-        pointer-events: none; }
-
-      .parent text {
-        fill: #1f77b4; }
-
-      circle {
-        fill: #ccc;
-        /*pointer-events: all;*/
-        stroke: #999; }
-
-      .parent circle {
-        fill: #1f77b4;
-        fill-opacity: 0.1;
-        stroke: steelblue; }
-
-      .parent:hover circle {
-        stroke: #ff7f0e;
-        stroke-width: 0.5px; }
-
-      .child circle {
         pointer-events: none; }
     </style>
   </head>
@@ -51,8 +31,13 @@
           var classes = [];
 
           function recurse(name, node) {
-            if (node.children) node.children.forEach(function(child) { recurse(node.name, child); });
-            else classes.push({packageName: name, className: node.name, value: node.size});
+            if (node.children) {
+              node.children.forEach(function(child) { recurse(node.name, child); });
+            } else {
+              var newNode = {packageName: name, className: node.name, value: node.size};
+              for (var attr in node) { newNode[attr] = node[attr]; }
+              classes.push(newNode);
+            }
           }
 
           recurse(null, root);
@@ -87,7 +72,7 @@
               .formats({ title: title, fill: fill })
 
               //.diameter(200)
-              .zoomable([0.1, 4])
+              //.zoomable([0.1, 4])
               //.duration(200)
               ;
 

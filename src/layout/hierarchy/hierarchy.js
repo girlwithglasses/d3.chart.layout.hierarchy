@@ -3,8 +3,8 @@ d3.chart("hierarchy", {
 
   initialize: function() {
 
-    this.d3     = {};
-    this.layers = {};
+    this.d3      = {};
+    this.layers  = {};
 
     this.base.attr("width",  this.base.node().parentNode.clientWidth);
     this.base.attr("height", this.base.node().parentNode.clientHeight);
@@ -13,10 +13,17 @@ d3.chart("hierarchy", {
     this.layers.base = this.base.append("g");
     
     this.name(this._name         || "name");
-    this.value(this._value     || "value");
+    this.value(this._value       || "value");
     this.duration(this._duration || 750);
+
   },
 
+
+
+
+  transform: function(root) {
+    return root;
+  },
 
 
   name: function(_) {

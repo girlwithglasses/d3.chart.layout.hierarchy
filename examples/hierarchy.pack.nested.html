@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Nested Pack Example</title>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../lib/d3.min.js"></script>
     <script src="../lib/d3.chart.min.js"></script>
     <script src="../d3.chart.layout.hierarchy.min.js"></script>
     <style>
@@ -24,7 +24,6 @@
 
       circle {
         fill: #ccc;
-        /*pointer-events: all;*/
         stroke: #999; }
 
       .parent circle {
@@ -35,9 +34,6 @@
       .parent:hover circle {
         stroke: #ff7f0e;
         stroke-width: 0.5px; }
-
-      .child circle {
-        pointer-events: none; }
     </style>
   </head>
   <body>

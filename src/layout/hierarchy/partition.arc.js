@@ -13,7 +13,7 @@ d3.chart("hierarchy").extend("partition.arc", {
     chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
 
 
-    var color      = d3.scale.category20c();
+    chart.d3.color = d3.scale.category20c();
     chart.d3.x     = d3.scale.linear().range([0, 2 * Math.PI]);
     chart.d3.y     = d3.scale.sqrt().range([0, chart._diameter / 2]);
     chart.d3.arc   = d3.svg.arc()
@@ -42,7 +42,26 @@ d3.chart("hierarchy").extend("partition.arc", {
       events: {
         enter: function() {
           this.attr("d", chart.d3.arc)
-            .style("fill", function(d) { return color((d.children ? d : d.parent)[chart._name]); });
+            .style("fill", function(d) { return chart.d3.color((d.children ? d : d.parent)[chart._name]); });
+
+          this.on("click", function(event) {
+            var that = this;
+
+            setTimeout(function() {
+              var dblclick = parseInt(that.getAttribute("data-double"), 10);
+              if (dblclick > 0) {
+                that.setAttribute("data-double", dblclick-1);
+              } else {
+                chart.trigger("singleClick", event);
+              }
+            }, 300);
+            d3.event.stopPropagation();
+
+          }).on("dblclick", function(event) {
+            this.setAttribute("data-double", 2);
+            chart.trigger("doubleClick", event);
+            d3.event.stopPropagation();
+          });
         }
       }
     });
@@ -88,7 +107,7 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.layers.base.on("merge", function() {
       var path = this;
-      this.on("click", function(d) {
+      chart.on("singleClick", function(d) {
           path.transition()
             .duration(chart._duration)
             .attrTween("d", arcTween(d));
@@ -107,5 +126,6 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     return this;
   },
+
 });
 
