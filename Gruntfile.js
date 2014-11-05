@@ -100,3 +100,4 @@ module.exports = function(grunt) {
   grunt.registerTask("default", ["concat", "uglify"]);
   grunt.registerTask("release", ["jshint", "concat", "uglify"]);
 };
+
