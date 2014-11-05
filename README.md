@@ -1,5 +1,5 @@
 
-# d3.chart.layout
+# d3.chart.layout **v0.1.1**
 
 Collection of reusable d3.layouts built with [d3.chart](http://misoproject.com/d3-chart/) framework.
 
