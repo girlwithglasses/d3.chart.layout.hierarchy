@@ -10,7 +10,7 @@ module.exports = function(grunt) {
       banner: "/*! <%= meta.pkg.name %> - v<%= meta.pkg.version %>\n" +
               " *  <%= meta.pkg.homepage %>\n" +
               " *  \n" +
-              " *  Copyright (c) 2014 <%= meta.pkg.author %>\n" +
+              " *  Copyright (c) 2015 <%= meta.pkg.author %>\n" +
               " *  License under the <%= meta.pkg.license %>.\n" +
               " */\n"
     },

@@ -1,5 +1,5 @@
 
-# d3.chart.layout **v0.1.1**
+# d3.chart.layout **v0.2.0**
 
 Collection of reusable d3.layouts built with [d3.chart](http://misoproject.com/d3-chart/) framework.
 
@@ -13,7 +13,7 @@ Collection of reusable d3.layouts built with [d3.chart](http://misoproject.com/d
   - [Treemap](#treemap)
 
 
-The input data is a vertex-labeled graph:
+The input is a vertex-labeled rooted tree:
 
 ```javascript
 { "name": "Root",
@@ -81,7 +81,7 @@ cluster.draw(data);
 
 [&lt;instance&gt;.<b>radius</b>([<i>length</i>])](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r) - specify the node radius.
 
-&lt;instance&gt;.<b>collapsible</b>() - apply the collapse behavior to the graph.
+&lt;instance&gt;.<b>collapsible</b>([<i>depth</i>]) - apply the collapse behavior to the graph with the initial depth of the collapsed nodes. If not specified, returns the current depth, which defaults to Infinity.
 
 [&lt;instance&gt;.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
 
@@ -247,7 +247,7 @@ tree.draw(data);
 
 [&lt;instance&gt;.<b>radius</b>([<i>length</i>])](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r) - specify the node radius.
 
-&lt;instance&gt;.<b>collapsible</b>() - apply the collapse behavior to the graph.
+&lt;instance&gt;.<b>collapsible</b>([<i>depth</i>]) - apply the collapse behavior to the graph with the initial depth of the collapsed nodes. If not specified, returns the current depth, which defaults to Infinity.
 
 [&lt;instance&gt;.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
 
@@ -288,4 +288,13 @@ treemap.draw(data);
 &lt;instance&gt;.<b>collapsible</b>() - apply the collapse behavior to the graph.
 
 [&lt;instance&gt;.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
+
+
+
+## Changelog
+
+
+* 2015/01/24 - 0.2.0 - [added] numerical argument of the collapsible property indicating if the chart is collapsed at a specific depth or not at the initial render
+* 2014/11/05 - 0.1.1 - [fixed] several bugs
+
 
