@@ -49,7 +49,7 @@ var cluster = d3.select("#vis")
     .margin({ top: 0, right: 60, bottom: 0, left: 60 })
     .radius(3)
     .zoomable([0.1, 3])
-    .collapsible()
+    .collapsible(1)
     .duration(200);
 
 cluster.draw(data);
@@ -63,7 +63,7 @@ var cluster = d3.select("#vis")
     .diameter(350)
     .radius(3)
     .zoomable([0.1, 3])
-    .collapsible()
+    .collapsible(2)
     .duration(200);
 
 cluster.draw(data);
@@ -215,7 +215,7 @@ var tree = d3.select("#vis")
     .margin({ top: 0, right: 60, bottom: 0, left: 60 })
     .radius(3)
     .zoomable([0.1, 3])
-    .collapsible()
+    .collapsible(1)
     .duration(200);
 
 tree.draw(data);
