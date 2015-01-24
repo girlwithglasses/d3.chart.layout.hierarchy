@@ -1,7 +1,7 @@
 
 # d3.chart.layout **v0.2.0**
 
-Collection of reusable d3.layouts built with [d3.chart](http://misoproject.com/d3-chart/) framework.
+Collection of interacitve and reusable d3.layouts built with [d3.chart](http://misoproject.com/d3-chart/) framework.
 
 ## d3.chart.layout.hierarchy
 
