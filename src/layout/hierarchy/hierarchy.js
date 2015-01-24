@@ -16,6 +16,24 @@ d3.chart("hierarchy", {
     this.value(this._value       || "value");
     this.duration(this._duration || 750);
 
+
+
+    // http://bl.ocks.org/robschmuecker/7926762
+    this.walker = function (parent, walkerFunction, childrenFunction) {
+      if ( ! parent) {
+        return;
+      }
+
+      walkerFunction(parent);
+
+      var children = childrenFunction(parent);
+      if (children) {
+        for (var count = children.length, i = 0; i < count; i++) {
+          this.walker(children[i], walkerFunction, childrenFunction);
+        }
+      }
+    };
+
   },
 
 

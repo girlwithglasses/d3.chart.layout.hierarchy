@@ -129,7 +129,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
       return this._radius;
     }
 
-    this._radius = _;  
+    this._radius = _;
 
     this.trigger("change:radius");
     if (this.root) {
@@ -140,12 +140,27 @@ d3.chart("hierarchy").extend("cluster-tree", {
   },
 
 
-  collapsible: function() {
+  collapsible: function(_) {
     var chart = this;
 
+    var depth = _ || Infinity;
+
     chart.once("collapse:init", function() {
-      chart.root.children.forEach(collapse);
+
+      chart.walker(
+        chart.root,
+        function(d) { if (d.depth+1 == depth && d.children) { d.children.forEach(collapse); }},
+        function(d) {
+          if (d.children && d.children.length > 0 && d.depth < depth) {
+            return d.children;
+          } else if (d._children && d._children.length > 0 && d.depth < depth) {
+            return d._children;
+          } else {
+            return null;
+          }
+        });
     });
+
 
 
     chart.on("singleClick", function(d) {

@@ -1,7 +1,7 @@
-/*! d3.chart.layout - v0.1.1
+/*! d3.chart.layout - v0.2.0
  *  https://github.com/bansaghi/d3.chart.layout/
  *  
- *  Copyright (c) 2014 Anna Bansaghi
+ *  Copyright (c) 2015 Anna Bansaghi
  *  License under the BSD license.
  */
 
@@ -21,6 +21,24 @@ d3.chart("hierarchy", {
     this.name(this._name         || "name");
     this.value(this._value       || "value");
     this.duration(this._duration || 750);
+
+
+
+    // http://bl.ocks.org/robschmuecker/7926762
+    this.walker = function (parent, walkerFunction, childrenFunction) {
+      if ( ! parent) {
+        return;
+      }
+
+      walkerFunction(parent);
+
+      var children = childrenFunction(parent);
+      if (children) {
+        for (var count = children.length, i = 0; i < count; i++) {
+          this.walker(children[i], walkerFunction, childrenFunction);
+        }
+      }
+    };
 
   },
 
@@ -229,7 +247,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
       return this._radius;
     }
 
-    this._radius = _;  
+    this._radius = _;
 
     this.trigger("change:radius");
     if (this.root) {
@@ -240,12 +258,27 @@ d3.chart("hierarchy").extend("cluster-tree", {
   },
 
 
-  collapsible: function() {
+  collapsible: function(_) {
     var chart = this;
 
+    var depth = _ || Infinity;
+
     chart.once("collapse:init", function() {
-      chart.root.children.forEach(collapse);
+
+      chart.walker(
+        chart.root,
+        function(d) { if (d.depth+1 == depth && d.children) { d.children.forEach(collapse); }},
+        function(d) {
+          if (d.children && d.children.length > 0 && d.depth < depth) {
+            return d.children;
+          } else if (d._children && d._children.length > 0 && d.depth < depth) {
+            return d._children;
+          } else {
+            return null;
+          }
+        });
     });
+
 
 
     chart.on("singleClick", function(d) {
