@@ -1,10 +1,9 @@
 
 # d3.chart.layout **v0.2.0**
 
-Collection of interacitve and reusable d3.layouts built with [d3.chart](http://misoproject.com/d3-chart/) framework.
-
 ## d3.chart.layout.hierarchy
 
+Collection of interactive and reusable [d3 hierarchy layouts](https://github.com/mbostock/d3/wiki/Hierarchy-Layout) built with [d3.chart](http://misoproject.com/d3-chart/) framework.
 
   - [Cluster](#cluster)
   - [Pack](#pack)
