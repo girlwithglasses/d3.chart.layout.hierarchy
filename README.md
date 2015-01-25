@@ -75,18 +75,18 @@ cluster.<b>name</b>([<i>name</i>]) - get or set the text accessor of a cluster. 
 
 [cluster.<b>value</b>([<i>value</i>])](https://github.com/mbostock/d3/wiki/Cluster-Layout#value) - get or set the value accessor of a cluster. If not specified, returns the current value accessor, which assumes that each node has a numeric `value` attribute.
 
-[cluster.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
+[cluster.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds. If not specified, a default of `750` is used.
 
-[cluster.<b>radius</b>([<i>length</i>])](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r) - specify the node radius.
+[cluster.<b>radius</b>([<i>length</i>])](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r) - specify the node radius. If not specified, a default of `4.5` pixels is used.
 
 cluster.<b>collapsible</b>([<i>depth</i>]) - apply the collapse behavior to the cluster with the initial depth of the collapsed nodes. If not specified, returns the current depth, which defaults to `Infinity`.
 
-[cluster.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
+[cluster.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.  If not specified, a default of `[0, Infinity]` is used.
 
 
-[clusterCartesian.<b>margin</b>([<i>values</i>])](http://bl.ocks.org/mbostock/3019563) - get or set the margin object with properties for the four sides.
+[clusterCartesian.<b>margin</b>([<i>values</i>])](http://bl.ocks.org/mbostock/3019563) - get or set the margin object with properties for the four sides. If not specified, a default of `{ top: 0, right: 0, bottom: 0, left: 0 }` is used.
 
-clusterRadial.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the cluster.
+clusterRadial.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the cluster. If not specified, a default of the minimum of the `width` and `height` is used.
 
 
 ## <a id="pack"></a> Pack Layout
@@ -133,11 +133,11 @@ pack.<b>name</b>([<i>name</i>]) - get or set the text accessor of a pack. If not
 
 [pack.<b>value</b>([<i>value</i>])](https://github.com/mbostock/d3/wiki/Pack-Layout#value) - get or set the value accessor of a pack. If not specified, returns the current value accessor, which assumes that each node has a numeric `value` attribute.
 
-[pack.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
+[pack.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds. If not specified, a default of `750` is used.
 
-pack.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the pack.
+pack.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the pack. If not specified, a default of the minimum of the `width` and `height` is used.
 
-[pack.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
+[pack.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range. If not specified, a default of `[0, Infinity]` is used.
 
 packNested.<b>collapsible</b>() - apply the collapse behavior to the pack.
 
@@ -186,14 +186,14 @@ partition.<b>name</b>([<i>name</i>]) - get or set the text accessor of a partiti
 
 [partition.<b>value</b>([<i>value</i>])](https://github.com/mbostock/d3/wiki/Partition-Layout#value) - get or set the value accessor of a partition. If not specified, returns the current value accessor, which assumes that each node has a numeric `value` attribute.
 
-[partition.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
+[partition.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds. If not specified, a default of `750` is used.
 
 partition.<b>collapsible</b>() - apply the collapse behavior to the partition.
 
-[partition.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
+[partition.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range. If not specified, a default of `[0, Infinity]` is used.
 
 
-partitionArc.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the sunburst.
+partitionArc.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the sunburst. If not specified, a default of the minimum of the `width` and `height` is used.
 
 
 ## <a id="tree"></a> Tree Layout
@@ -238,18 +238,18 @@ tree.<b>name</b>([<i>name</i>]) - get or set the text accessor of a tree. If not
 
 [tree.<b>value</b>([<i>value</i>])](https://github.com/mbostock/d3/wiki/Tree-Layout#value) - get or set the value accessor of a tree. If not specified, returns the current value accessor, which assumes that each node has a numeric `value` attribute.
 
-[tree.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
+[tree.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds. If not specified, a default of `750` is used.
 
-[tree.<b>radius</b>([<i>length</i>])](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r) - specify the node radius.
+[tree.<b>radius</b>([<i>length</i>])](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r) - specify the node radius. If not specified, a default of `4.5` pixels is used.
 
 tree.<b>collapsible</b>([<i>depth</i>]) - apply the collapse behavior to the tree with the initial depth of the collapsed nodes. If not specified, returns the current depth, which defaults to `Infinity`.
 
-[tree.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
+[tree.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range. If not specified, a default of `[0, Infinity]` is used.
 
 
-[treeCartesian.<b>margin</b>([<i>values</i>])](http://bl.ocks.org/mbostock/3019563) - get or set the margin object with properties for the four sides.
+[treeCartesian.<b>margin</b>([<i>values</i>])](http://bl.ocks.org/mbostock/3019563) - get or set the margin object with properties for the four sides. If not specified, a default of `{ top: 0, right: 0, bottom: 0, left: 0 }` is used.
 
-treeRadial.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the tree.
+treeRadial.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the tree. If not specified, a default of the minimum of the `width` and `height` is used.
 
 
 
@@ -278,11 +278,11 @@ treemap.<b>name</b>([<i>name</i>]) - get or set the text accessor of a treemap. 
 
 [treemap.<b>value</b>([<i>value</i>])](https://github.com/mbostock/d3/wiki/Treemap-Layout#value) - get or set the value accessor of a treemap. If not specified, returns the current value accessor, which assumes that each node has a numeric `value` attribute.
 
-[treemap.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
+[treemap.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds. If not specified, a default of `750` is used.
 
 treemap.<b>collapsible</b>() - apply the collapse behavior to the treemap.
 
-[treemap.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
+[treemap.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range. If not specified, a default of `[0, Infinity]` is used.
 
 
 
@@ -291,6 +291,7 @@ treemap.<b>collapsible</b>() - apply the collapse behavior to the treemap.
 
 * 2015/01/24 - 0.2.0 - [added] numerical argument of the collapsible property indicating if the chart is collapsed at a specific depth or not at the initial render
 * 2014/11/05 - 0.1.1 - [fixed] several bugs
+
 
 
 
