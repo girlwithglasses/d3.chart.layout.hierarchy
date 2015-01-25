@@ -33,8 +33,7 @@ The input is a vertex-labeled rooted tree, called hierarchy:
 }
 ```
 
-
-## Cluster Layout
+## <a id="cluster"></a> Cluster Layout
 
 View [cartesian cluster demo](http://bl.ocks.org/bansaghi/ffc9d995f77e9ccd4ea9) and [radial cluster demo](http://bl.ocks.org/bansaghi/e490c7c238a67a77996d)
 
@@ -90,7 +89,7 @@ cluster.<b>collapsible</b>([<i>depth</i>]) - apply the collapse behavior to the 
 clusterRadial.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the cluster.
 
 
-## Pack Layout
+## <a id="pack"></a> Pack Layout
 
 View [nested pack demo](http://bl.ocks.org/bansaghi/4b542562da43e1ae3e40) and [flattened pack demo](http://bl.ocks.org/bansaghi/7588173d69ec85451ee2)
 
@@ -149,7 +148,7 @@ packFlattened.<b>formats</b>([<i>formats</i>]) - get or set the formats object w
 
 
 
-## Partition Layout
+## <a id="partition"></a> Partition Layout
 
 View [arc partitiion demo](http://bl.ocks.org/bansaghi/2617fed0c286365c7f49) and [rectangle partition demo](http://bl.ocks.org/bansaghi/4fde0154055c0f0580b7)
 
@@ -197,9 +196,7 @@ partition.<b>collapsible</b>() - apply the collapse behavior to the partition.
 partitionArc.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the sunburst.
 
 
-
-
-## Tree Layout
+## <a id="tree"></a> Tree Layout
 
 View [cartesian tree demo](http://bl.ocks.org/bansaghi/b0e74b395d1909657ded) and [radial tree demo](http://bl.ocks.org/bansaghi/f3cbb5e7b759b6a58aff)
 
@@ -256,7 +253,7 @@ treeRadial.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the tree
 
 
 
-## Treemap Layout
+## <a id="treemap"></a> Treemap Layout
 
 View [treemap demo](http://bl.ocks.org/bansaghi/5d24b37ebe077d4e919f)
 
