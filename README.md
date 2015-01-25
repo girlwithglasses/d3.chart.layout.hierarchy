@@ -12,7 +12,7 @@ Collection of interactive and reusable [d3 hierarchy layouts](https://github.com
   - [Treemap](#treemap)
 
 
-The input is a vertex-labeled rooted tree:
+The input is a vertex-labeled rooted tree, called hierarchy:
 
 ```javascript
 { "name": "Root",
@@ -34,7 +34,7 @@ The input is a vertex-labeled rooted tree:
 ```
 
 
-## Cluster
+## Cluster Layout
 
 View [cartesian cluster demo](http://bl.ocks.org/bansaghi/ffc9d995f77e9ccd4ea9) and [radial cluster demo](http://bl.ocks.org/bansaghi/e490c7c238a67a77996d)
 
@@ -72,25 +72,25 @@ cluster.draw(data);
 
 #### API
 
-&lt;instance&gt;.<b>name</b>([<i>name</i>]) - get or set the textual content of a node.
+cluster.<b>name</b>([<i>name</i>]) - get or set the text accessor of a cluster. If not specified, returns the current text accessor, which assumes that each node has a textual `name` attribute.
 
-&lt;instance&gt;.<b>value</b>([<i>value</i>]) - get or set the numerical value of a node.
+[cluster.<b>value</b>([<i>value</i>])](https://github.com/mbostock/d3/wiki/Cluster-Layout#value) - get or set the value accessor of a cluster. If not specified, returns the current value accessor, which assumes that each node has a numeric `value` attribute.
 
-[&lt;instance&gt;.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
+[cluster.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
 
-[&lt;instance&gt;.<b>radius</b>([<i>length</i>])](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r) - specify the node radius.
+[cluster.<b>radius</b>([<i>length</i>])](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r) - specify the node radius.
 
-&lt;instance&gt;.<b>collapsible</b>([<i>depth</i>]) - apply the collapse behavior to the graph with the initial depth of the collapsed nodes. If not specified, returns the current depth, which defaults to Infinity.
+cluster.<b>collapsible</b>([<i>depth</i>]) - apply the collapse behavior to the cluster with the initial depth of the collapsed nodes. If not specified, returns the current depth, which defaults to `Infinity`.
 
-[&lt;instance&gt;.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
-
-
-[&lt;instance.cartesian&gt;.<b>margin</b>([<i>values</i>])](http://bl.ocks.org/mbostock/3019563) - get or set the margin object with properties for the four sides.
-
-&lt;instance.radial&gt;.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the graph.
+[cluster.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
 
 
-## Pack
+[clusterCartesian.<b>margin</b>([<i>values</i>])](http://bl.ocks.org/mbostock/3019563) - get or set the margin object with properties for the four sides.
+
+clusterRadial.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the cluster.
+
+
+## Pack Layout
 
 View [nested pack demo](http://bl.ocks.org/bansaghi/4b542562da43e1ae3e40) and [flattened pack demo](http://bl.ocks.org/bansaghi/7588173d69ec85451ee2)
 
@@ -130,27 +130,26 @@ pack.draw(data);
 
 #### API
 
-&lt;instance&gt;.<b>name</b>([<i>name</i>]) - get or set the textual content of a node.
+pack.<b>name</b>([<i>name</i>]) - get or set the text accessor of a pack. If not specified, returns the current text accessor, which assumes that each node has a textual `name` attribute.
 
-&lt;instance&gt;.<b>value</b>([<i>value</i>]) - get or set the numerical value of a node.
+[pack.<b>value</b>([<i>value</i>])](https://github.com/mbostock/d3/wiki/Pack-Layout#value) - get or set the value accessor of a pack. If not specified, returns the current value accessor, which assumes that each node has a numeric `value` attribute.
 
-[&lt;instance&gt;.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
+[pack.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
 
-&lt;instance&gt;.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the graph.
+pack.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the pack.
 
-[&lt;instance&gt;.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
+[pack.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
 
+packNested.<b>collapsible</b>() - apply the collapse behavior to the pack.
 
-&lt;instance.nested&gt;.<b>collapsible</b>() - apply the collapse behavior to the graph.
+packFlattened.<b>flatten</b>([<i>function</i>]) - specify the hierarchy flattening function.
 
-&lt;instance.flattened&gt;.<b>flatten</b>([<i>function</i>]) - specify the hierarchy flattening function.
-
-&lt;instance.flattened&gt;.<b>formats</b>([<i>formats</i>]) - get or set the formats object with properties for the formatting functions.
-
+packFlattened.<b>formats</b>([<i>formats</i>]) - get or set the formats object with properties for the formatting functions.
 
 
 
-## Partition
+
+## Partition Layout
 
 View [arc partitiion demo](http://bl.ocks.org/bansaghi/2617fed0c286365c7f49) and [rectangle partition demo](http://bl.ocks.org/bansaghi/4fde0154055c0f0580b7)
 
@@ -184,23 +183,23 @@ partition.draw(data);
 
 #### API
 
-&lt;instance&gt;.<b>name</b>([<i>name</i>]) - get or set the textual content of a node.
+partition.<b>name</b>([<i>name</i>]) - get or set the text accessor of a partition. If not specified, returns the current text accessor, which assumes that each node has a textual `name` attribute.
 
-&lt;instance&gt;.<b>value</b>([<i>value</i>]) - get or set the numerical value of a node.
+[partition.<b>value</b>([<i>value</i>])](https://github.com/mbostock/d3/wiki/Partition-Layout#value) - get or set the value accessor of a partition. If not specified, returns the current value accessor, which assumes that each node has a numeric `value` attribute.
 
-[&lt;instance&gt;.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
+[partition.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
 
-&lt;instance&gt;.<b>collapsible</b>() - apply the collapse behavior to the graph.
+partition.<b>collapsible</b>() - apply the collapse behavior to the partition.
 
-[&lt;instance&gt;.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
-
-
-&lt;instance.arc&gt;.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the graph.
+[partition.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
 
 
+partitionArc.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the sunburst.
 
 
-## Tree
+
+
+## Tree Layout
 
 View [cartesian tree demo](http://bl.ocks.org/bansaghi/b0e74b395d1909657ded) and [radial tree demo](http://bl.ocks.org/bansaghi/f3cbb5e7b759b6a58aff)
 
@@ -238,26 +237,26 @@ tree.draw(data);
 
 #### API
 
-&lt;instance&gt;.<b>name</b>([<i>name</i>]) - get or set the textual content of a node.
+tree.<b>name</b>([<i>name</i>]) - get or set the text accessor of a tree. If not specified, returns the current text accessor, which assumes that each node has a textual `name` attribute.
 
-&lt;instance&gt;.<b>value</b>([<i>value</i>]) - get or set the numerical value of a node.
+[tree.<b>value</b>([<i>value</i>])](https://github.com/mbostock/d3/wiki/Tree-Layout#value) - get or set the value accessor of a tree. If not specified, returns the current value accessor, which assumes that each node has a numeric `value` attribute.
 
-[&lt;instance&gt;.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
+[tree.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
 
-[&lt;instance&gt;.<b>radius</b>([<i>length</i>])](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r) - specify the node radius.
+[tree.<b>radius</b>([<i>length</i>])](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r) - specify the node radius.
 
-&lt;instance&gt;.<b>collapsible</b>([<i>depth</i>]) - apply the collapse behavior to the graph with the initial depth of the collapsed nodes. If not specified, returns the current depth, which defaults to Infinity.
+tree.<b>collapsible</b>([<i>depth</i>]) - apply the collapse behavior to the tree with the initial depth of the collapsed nodes. If not specified, returns the current depth, which defaults to `Infinity`.
 
-[&lt;instance&gt;.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
-
-
-[&lt;instance.cartesian&gt;.<b>margin</b>([<i>values</i>])](http://bl.ocks.org/mbostock/3019563) - get or set the margin object with properties for the four sides.
-
-&lt;instance.radial&gt;.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the graph.
+[tree.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
 
 
+[treeCartesian.<b>margin</b>([<i>values</i>])](http://bl.ocks.org/mbostock/3019563) - get or set the margin object with properties for the four sides.
 
-## Treemap
+treeRadial.<b>diameter</b>([<i>value</i>]) - get or set the diameter of the tree.
+
+
+
+## Treemap Layout
 
 View [treemap demo](http://bl.ocks.org/bansaghi/5d24b37ebe077d4e919f)
 
@@ -278,15 +277,15 @@ treemap.draw(data);
 
 #### API
 
-&lt;instance&gt;.<b>name</b>([<i>name</i>]) - get or set the textual content of a node.
+treemap.<b>name</b>([<i>name</i>]) - get or set the text accessor of a treemap. If not specified, returns the current text accessor, which assumes that each node has a textual `name` attribute.
 
-&lt;instance&gt;.<b>value</b>([<i>value</i>]) - get or set the numerical value of a node.
+[treemap.<b>value</b>([<i>value</i>])](https://github.com/mbostock/d3/wiki/Treemap-Layout#value) - get or set the value accessor of a treemap. If not specified, returns the current value accessor, which assumes that each node has a numeric `value` attribute.
 
-[&lt;instance&gt;.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
+[treemap.<b>duration</b>([<i>duration</i>])](https://github.com/mbostock/d3/wiki/Transitions#duration) - specify per-element duration in milliseconds.
 
-&lt;instance&gt;.<b>collapsible</b>() - apply the collapse behavior to the graph.
+treemap.<b>collapsible</b>() - apply the collapse behavior to the treemap.
 
-[&lt;instance&gt;.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
+[treemap.<b>zoomable</b>([<i>scaleExtent</i>])](https://github.com/mbostock/d3/wiki/Zoom-Behavior) - apply the zoom behavior with two-element array for the range.
 
 
 
@@ -295,5 +294,6 @@ treemap.draw(data);
 
 * 2015/01/24 - 0.2.0 - [added] numerical argument of the collapsible property indicating if the chart is collapsed at a specific depth or not at the initial render
 * 2014/11/05 - 0.1.1 - [fixed] several bugs
+
 
 
