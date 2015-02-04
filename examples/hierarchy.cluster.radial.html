@@ -9,11 +9,13 @@
     <style>
       html {
         display: table;
-        margin: auto; }
+        margin: auto;
+        width: 100%; }
 
       #vis {
-        width: 960px;
-        height: 1000px; }
+        width: 70%;
+        height: 700px;
+        margin: auto; }
 
       .node {
         cursor: pointer; }
@@ -38,19 +40,17 @@
 
     <script>
       (function() {
-        d3.json("data/flare.json", function(error, json) {
-          createDiagram(json);
-        });
 
         function radius(d) {
           return Math.log(d.size);
         }
 
-        function createDiagram(data) {
-          var cluster = d3.select("#vis")
-            .append("svg")
+        d3.json("data/flare.json", function(error, json) {
+
+          var cluster = d3.select("#vis").append("svg")
+
             .chart("cluster.radial")
-              .value("size")
+
               //.diameter(500)
               //.radius(radius)
               .zoomable([0.1, 3])
@@ -58,8 +58,9 @@
               //.duration(200)
               ;
 
-          cluster.draw(data);
-        }
+          cluster.draw(json);
+
+        });
       }());
     </script>
   </body>

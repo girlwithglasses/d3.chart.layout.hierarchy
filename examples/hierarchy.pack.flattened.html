@@ -9,11 +9,13 @@
     <style>
       html {
         display: table;
-        margin: auto; }
+        margin: auto;
+        width: 100%; }
 
       #vis {
-        width: 960px;
-        height: 1000px; }
+        width: 100%;
+        height: 700px;
+        margin: auto; }
 
       text {
         font: 12px sans-serif;
@@ -58,26 +60,23 @@
 
 
         d3.json("data/flare.json", function(error, json) {
-          createDiagram(json);
-        });
 
-        function createDiagram(data) {
-          var pack = d3.select("#vis")
-            .append("svg")
+          var pack = d3.select("#vis").append("svg")
+
             .chart("pack.flattened")
-              //.value("size")
 
+              //.diameter(200)
+              //.value("_count")
               .name("className")
               .flatten(classes)
               .formats({ title: title, fill: fill })
-
-              //.diameter(200)
               //.zoomable([0.1, 4])
               //.duration(200)
               ;
 
-          pack.draw(data);
-        }
+          pack.draw(json);
+
+        });
       }());
     </script>
   </body>
