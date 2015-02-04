@@ -6,19 +6,22 @@ module.exports = function(grunt) {
 
     meta: {
       pkg: grunt.file.readJSON("package.json"),
-      srcFiles: ["src/**/*.js"],
-      banner: "/*! <%= meta.pkg.name %> - v<%= meta.pkg.version %>\n" +
-              " *  <%= meta.pkg.homepage %>\n" +
-              " *  \n" +
-              " *  Copyright (c) 2015 <%= meta.pkg.author %>\n" +
-              " *  License under the <%= meta.pkg.license %>.\n" +
+
+      srcFiles: ["src/**/*.js", '!src/layout/hierarchy/header.js', '!src/layout/hierarchy/footer.js'],
+
+      banner: "/*!\n" +
+              " * <%= meta.pkg.name %> - v<%= meta.pkg.version %>\n" +
+              " * <%= meta.pkg.homepage %>\n" +
+              " * \n" +
+              " * Copyright (c) 2015 <%= meta.pkg.author.name %>\n" +
+              " * Library released under <%= meta.pkg.license.type %> license.\n" +
               " */\n"
     },
 
     watch: {
       scripts: {
         files: "<%= meta.srcFiles %>",
-        tasks: ["jshint"]
+        tasks: ["concat"]
       }
     },
 
@@ -75,7 +78,12 @@ module.exports = function(grunt) {
           banner: "<%= meta.banner %>"
         },
         files: {
-          "d3.chart.layout.hierarchy.js": ["stage/parents.js", "stage/children.js"]
+          "d3.chart.layout.hierarchy.js": [
+            "src/layout/hierarchy/header.js",
+            "stage/parents.js",
+            "stage/children.js",
+            "src/layout/hierarchy/footer.js"
+          ]
         }
       }
     },
@@ -97,7 +105,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-uglify");
   grunt.loadNpmTasks("grunt-contrib-watch");
 
-  grunt.registerTask("default", ["concat", "uglify"]);
+  grunt.registerTask("default", ["concat"]);
   grunt.registerTask("release", ["jshint", "concat", "uglify"]);
 };
 
