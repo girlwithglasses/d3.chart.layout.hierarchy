@@ -6,8 +6,9 @@ d3.chart("hierarchy", {
     this.d3      = {};
     this.layers  = {};
 
-    this.base.attr("width",  this.base.node().parentNode.clientWidth);
-    this.base.attr("height", this.base.node().parentNode.clientHeight);
+
+    this.base.attr("width",  this.base.node().parentElement.clientWidth);
+    this.base.attr("height", this.base.node().parentElement.clientHeight);
 
     this.d3.zoom = d3.behavior.zoom();
     this.layers.base = this.base.append("g");
@@ -35,7 +36,6 @@ d3.chart("hierarchy", {
     };
 
   },
-
 
 
 
@@ -106,6 +106,22 @@ d3.chart("hierarchy", {
 
     return chart;
   },
+
+
+  sort: function(_) {
+    var chart = this;
+
+    if (_ === "_ASC") {
+      chart.d3.layout.sort(function(a, b) { return d3.ascending(a[chart._name], b[chart._name] ); });
+    } else if (_ === "_DESC") {
+      chart.d3.layout.sort(function(a, b) { return d3.descending(a[chart._name], b[chart._name] ); });
+    } else {
+      chart.d3.layout.sort(_);
+    }
+
+    return this;
+  },
+
 });
 
 

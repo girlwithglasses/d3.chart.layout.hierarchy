@@ -87,7 +87,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
       .size([chart._diameter, chart._diameter])
       .sort(null)
       .padding(1.5)
-      .value(function(d) { return d[chart._value]; })
+      .value(function(d) { return chart._value === "_COUNT" ? 1 : d[chart._value]; })
       .nodes(chart._flatten ? chart._flatten(root) : root);
   },
 

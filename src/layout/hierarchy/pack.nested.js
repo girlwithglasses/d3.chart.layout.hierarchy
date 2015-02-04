@@ -84,7 +84,7 @@ d3.chart("hierarchy").extend("pack.nested", {
    
     return chart.d3.layout
       .size([chart._diameter, chart._diameter])
-      .value(function(d) { return d[chart._value]; })
+      .value(function(d) { return chart._value === "_COUNT" ? 1 : d[chart._value]; })
       .nodes(root);
   },
 

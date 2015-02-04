@@ -62,7 +62,10 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
         "merge:transition": function() {
           this.select("circle")
-            .attr("r", chart._radius)
+            .attr("r", function(d) { return chart._radius === "_COUNT" && d._children ? d._children.length
+                                                                                      : chart._radius === "_COUNT" && d.children ? d.children.length
+                                                                                      : chart._radius === "_COUNT" && ! d._children ? 1
+                                                                                      : chart._radius === "_COUNT" && ! d.children ? 1 : chart._radius; })
             .style("stroke", function(d) { return d.path ? "brown" : "steelblue"; })
             .style("fill", function(d) { return d.path && ! d.parent.path ? "#E2A76F"
                                                                           : d._children ? "lightsteelblue" : "#fff"; });
@@ -143,22 +146,26 @@ d3.chart("hierarchy").extend("cluster-tree", {
   collapsible: function(_) {
     var chart = this;
 
-    var depth = _ || Infinity;
+    var depth = _;
 
     chart.once("collapse:init", function() {
 
-      chart.walker(
-        chart.root,
-        function(d) { if (d.depth+1 == depth && d.children) { d.children.forEach(collapse); }},
-        function(d) {
-          if (d.children && d.children.length > 0 && d.depth < depth) {
-            return d.children;
-          } else if (d._children && d._children.length > 0 && d.depth < depth) {
-            return d._children;
-          } else {
-            return null;
+      if (depth !== undefined) {
+
+        chart.walker(
+          chart.root,
+          function(d) { if (d.depth == depth) { collapse(d); }},
+          function(d) {
+            if (d.children && d.children.length > 0 && d.depth < depth) {
+              return d.children;
+            } else if (d._children && d._children.length > 0 && d.depth < depth) {
+              return d._children;
+            } else {
+              return null;
+            }
           }
-        });
+        );
+      }
     });
 
 

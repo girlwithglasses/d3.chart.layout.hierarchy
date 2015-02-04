@@ -73,7 +73,7 @@ d3.chart("hierarchy").extend("treemap", {
       .round(false)
       .size([chart._width, chart._height])
       .sticky(true)
-      .value(function(d) { return d[chart._value]; })
+      .value(function(d) { return chart._value === "_COUNT" ? 1 : d[chart._value]; })
       .nodes(root);
   },
 

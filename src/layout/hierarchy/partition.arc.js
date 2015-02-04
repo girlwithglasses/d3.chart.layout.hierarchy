@@ -81,7 +81,7 @@ d3.chart("hierarchy").extend("partition.arc", {
     chart.root = root;
 
     return chart.d3.layout
-      .value(function(d) { return d[chart._value]; })
+      .value(function(d) { return chart._value === "_COUNT" ? 1 : d[chart._value]; })
       .nodes(root);
   },
 
