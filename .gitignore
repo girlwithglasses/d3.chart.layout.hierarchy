@@ -3,3 +3,7 @@ stage
 gist
 misc
 
+# IDE files
+.idea/
+
+*.log
