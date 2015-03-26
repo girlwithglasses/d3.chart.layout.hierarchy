@@ -1,16 +1,14 @@
 
-# d3.chart.layout **v0.3.0**
+# d3.chart.layout.hierarchy **v0.3.1**
 
-## d3.chart.layout.hierarchy
-
-Collection of interactive and reusable [d3 hierarchy layouts](https://github.com/mbostock/d3/wiki/Hierarchy-Layout) built with [d3.chart](http://misoproject.com/d3-chart/) framework.
+Collection of interactive and reusable [D3 hierarchy layouts](https://github.com/mbostock/d3/wiki/Hierarchy-Layout) built with [d3.chart](http://misoproject.com/d3-chart/) framework.
 
 
 The input is a vertex-labeled rooted tree, and the output is a zoomable, collapsible hierarchy layout.
 
-For more information [see the Wiki](https://github.com/bansaghi/d3.chart.layout/wiki)
+For more information [see the Wiki](https://github.com/bansaghi/d3.chart.layout.hierarchy/wiki).
 
-### Example blocks
+## Example Blocks
 
 ##### Cluster Layout
 * [Cartesian Cluster](http://bl.ocks.org/bansaghi/ffc9d995f77e9ccd4ea9)
@@ -41,14 +39,12 @@ Build requirements:
 - [Grunt](http://gruntjs.com)
 - [Bower](http://bower.io/)
 
-To fetch required dependencies, run the following command from the root of
-this repository:
+To fetch required dependencies, run the following command from the root of this repository:
 
     $ npm install
     $ bower install
 
-After this, the project can be built by invoking Grunt from within this
-repository:
+After this, the project can be built by invoking Grunt from within this repository:
 
     $ grunt
     

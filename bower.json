@@ -1,11 +1,11 @@
 {
-  "name": "d3.chart.layout",
-  "version": "0.3.0",
-  "homepage": "https://github.com/bansaghi/d3.chart.layout/",
+  "name": "d3.chart.layout.hierarchy",
+  "version": "0.3.1",
+  "homepage": "https://github.com/bansaghi/d3.chart.layout.hierarchy/",
   "description": "Reusable D3 hierarchy layouts built with d3.chart",
   "main": "d3.chart.layout.hierarchy.js",
   "license": "BSD",
-  "private": true,
+  "private": false,
 
   "authors": [
     "Anna Bansaghi <anna.bansaghi@mamikon.net>"

@@ -1,6 +1,6 @@
 /*!
- * d3.chart.layout - v0.3.0
- * https://github.com/bansaghi/d3.chart.layout/
+ * d3.chart.layout.hierarchy - v0.3.1
+ * https://github.com/bansaghi/d3.chart.layout.hierarchy/
  * 
  * Copyright (c) 2015 Anna Bansaghi
  * Library released under BSD license.
@@ -131,7 +131,7 @@ d3.chart("hierarchy", {
       chart.d3.layout.sort(_);
     }
 
-    return this;
+    return chart;
   },
 
 });
@@ -1118,14 +1118,6 @@ d3.chart("cluster-tree.cartesian").extend("tree.cartesian", {
   initialize : function() {
     this.d3.layout = d3.layout.tree();
   },
-});
-
-
-d3.chart("cluster-tree.radial").extend("tree.radial", {
-
-  initialize : function() {
-    this.d3.layout = d3.layout.tree();
-  }
 });
 
 

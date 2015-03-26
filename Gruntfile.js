@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     meta: {
       pkg: grunt.file.readJSON("package.json"),
 
-      srcFiles: ["src/**/*.js", '!src/layout/hierarchy/header.js', '!src/layout/hierarchy/footer.js'],
+      srcFiles: ["src/**/*.js", '!src/start.js', '!src/end.js'],
 
       banner: "/*!\n" +
               " * <%= meta.pkg.name %> - v<%= meta.pkg.version %>\n" +
@@ -55,21 +55,21 @@ module.exports = function(grunt) {
       stage: {
         files: {
           "stage/parents.js": [
-            "src/layout/hierarchy/hierarchy.js",
-            "src/layout/hierarchy/cluster-tree.js",
-            "src/layout/hierarchy/cluster-tree.cartesian.js",
-            "src/layout/hierarchy/cluster-tree.radial.js"
+            "src/hierarchy/hierarchy.js",
+            "src/hierarchy/cluster-tree.js",
+            "src/hierarchy/cluster-tree.cartesian.js",
+            "src/hierarchy/cluster-tree.radial.js"
           ],
           "stage/children.js": [
-            "src/layout/hierarchy/cluster.cartesian.js",
-            "src/layout/hierarchy/cluster.radial.js",
-            "src/layout/hierarchy/pack.flattened.js",
-            "src/layout/hierarchy/pack.nested.js",
-            "src/layout/hierarchy/partition.arc.js",
-            "src/layout/hierarchy/partition.rectangle.js",
-            "src/layout/hierarchy/tree.cartesian.js",
-            "src/layout/hierarchy/tree.radial.js",
-            "src/layout/hierarchy/treemap.js"
+            "src/cluster/cluster.cartesian.js",
+            "src/cluster/cluster.radial.js",
+            "src/pack/pack.flattened.js",
+            "src/pack/pack.nested.js",
+            "src/partition/partition.arc.js",
+            "src/partition/partition.rectangle.js",
+            "src/tree/tree.cartesian.js",
+            "src/tree/tree.radial.tree.js",
+            "src/treemap/treemap.js"
           ]
         }
       },
@@ -79,10 +79,10 @@ module.exports = function(grunt) {
         },
         files: {
           "d3.chart.layout.hierarchy.js": [
-            "src/layout/hierarchy/header.js",
+            "src/start.js",
             "stage/parents.js",
             "stage/children.js",
-            "src/layout/hierarchy/footer.js"
+            "src/end.js"
           ]
         }
       }
