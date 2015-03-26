@@ -1121,6 +1121,14 @@ d3.chart("cluster-tree.cartesian").extend("tree.cartesian", {
 });
 
 
+d3.chart("cluster-tree.radial").extend("tree.radial", {
+
+  initialize : function() {
+    this.d3.layout = d3.layout.tree();
+  }
+});
+
+
 d3.chart("hierarchy").extend("treemap", {
  
   initialize : function() {
