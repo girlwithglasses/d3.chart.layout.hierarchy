@@ -68,7 +68,7 @@ module.exports = function(grunt) {
             "src/partition/partition.arc.js",
             "src/partition/partition.rectangle.js",
             "src/tree/tree.cartesian.js",
-            "src/tree/tree.radial.tree.js",
+            "src/tree/tree.radial.js",
             "src/treemap/treemap.js"
           ]
         }
