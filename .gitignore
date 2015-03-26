@@ -1,5 +1,10 @@
 node_modules
+bower_components
 stage
 gist
 misc
 
+# IDE files
+.idea/
+
+*.log

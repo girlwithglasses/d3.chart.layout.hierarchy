@@ -32,3 +32,28 @@ For more information [see the Wiki](https://github.com/bansaghi/d3.chart.layout/
 * [Treemap](http://bl.ocks.org/bansaghi/5d24b37ebe077d4e919f)
 
 
+
+## Build Instructions
+
+Build requirements:
+
+- [Node.js](http://nodejs.org)
+- [Grunt](http://gruntjs.com)
+- [Bower](http://bower.io/)
+
+To fetch required dependencies, run the following command from the root of
+this repository:
+
+    $ npm install
+    $ bower install
+
+After this, the project can be built by invoking Grunt from within this
+repository:
+
+    $ grunt
+    
+To build the project along with minified version of the library, run:
+
+    $ grunt release
+
+
