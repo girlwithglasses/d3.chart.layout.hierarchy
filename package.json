@@ -1,34 +1,33 @@
 {
+  "version": "0.3.2",
   "name": "d3.chart.layout.hierarchy",
   "description": "Reusable D3 hierarchy layouts built with d3.chart",
+
+  "keywords": [
+    "d3.js",
+    "d3.chart",
+    "visualization",
+    "layout",
+    "hierarchy"
+  ],
+
   "homepage": "https://github.com/bansaghi/d3.chart.layout.hierarchy/",
-  "version": "0.3.1",
-  "author": {
-    "name": "Anna Bansaghi",
-    "email": "anna.bansaghi@mamikon.net",
-    "url": "http://mamikon.net/"
-  },
+  "author": "Anna Bansaghi <anna.bansaghi@mamikon.net> (http://mamikon.net)",
 
   "repository": {
     "type": "git",
-    "url": "git://github.com/bansaghi/d3.chart.layout.hierarchy.git"
+    "url": "https://github.com/bansaghi/d3.chart.layout.hierarchy"
   },
 
   "bugs": {
     "url": "https://github.com/bansaghi/d3.chart.layout.hierarchy/issues"
   },
-
-  "license": {
-    "type": "BSD",
-    "url": "https://github.com/bansaghi/d3.chart.layout.hierarchy/blob/master/LICENSE-BSD"
+  
+  "directories": {
+    "example": "./examples"
   },
 
-  "keywords": [
-    "d3.js",
-    "visualization",
-    "layout",
-    "hierarchy"
-  ],
+  "main": "./d3.chart.layout.hierarchy.js",
 
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -47,8 +46,5 @@
     "test": "vows --spec"
   },
 
-  "files": [
-    "src",
-    "LICENSE-BSD"
-  ]
+  "license": "BSD-3-Clause"
 }

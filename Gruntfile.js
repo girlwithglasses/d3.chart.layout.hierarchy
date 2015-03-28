@@ -1,3 +1,4 @@
+
 module.exports = function(grunt) {
 
   "use strict";
@@ -7,20 +8,20 @@ module.exports = function(grunt) {
     meta: {
       pkg: grunt.file.readJSON("package.json"),
 
-      srcFiles: ["src/**/*.js", '!src/start.js', '!src/end.js'],
+      source: ["src/**/*.js", '!src/start.js', '!src/end.js'],
 
       banner: "/*!\n" +
               " * <%= meta.pkg.name %> - v<%= meta.pkg.version %>\n" +
               " * <%= meta.pkg.homepage %>\n" +
               " * \n" +
-              " * Copyright (c) 2015 <%= meta.pkg.author.name %>\n" +
-              " * Library released under <%= meta.pkg.license.type %> license.\n" +
+              " * Copyright (c) 2015 <%= meta.pkg.author %>\n" +
+              " * Library released under <%= meta.pkg.license %> license.\n" +
               " */\n"
     },
 
     watch: {
       scripts: {
-        files: "<%= meta.srcFiles %>",
+        files: "<%= meta.source %>",
         tasks: ["concat"]
       }
     },
@@ -38,7 +39,7 @@ module.exports = function(grunt) {
           }
         },
         files: {
-          src: "<%= meta.srcFiles %>"
+          src: "<%= meta.source %>"
         }
       },
       grunt: {
