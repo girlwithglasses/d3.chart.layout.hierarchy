@@ -1,5 +1,5 @@
 
-# d3.chart.layout.hierarchy **v0.3.1**
+# d3.chart.layout.hierarchy
 
 Collection of interactive and reusable [D3 hierarchy layouts](https://github.com/mbostock/d3/wiki/Hierarchy-Layout) built with [d3.chart](http://misoproject.com/d3-chart/) framework.
 
