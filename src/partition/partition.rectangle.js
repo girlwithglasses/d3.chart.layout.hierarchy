@@ -20,13 +20,11 @@ d3.chart("hierarchy").extend("partition.rectangle", {
     chart.layer("base", chart.layers.base, {
 
       dataBind: function(data) {
-        return this.selectAll(".partition")
-          .data(data);
+        return this.selectAll(".partition").data(data);
       },
 
       insert: function() {
-        return this.append("g")
-          .classed("partition", true)
+        return this.append("g").classed("partition", true)
           .attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; });
       },
 
@@ -51,7 +49,7 @@ d3.chart("hierarchy").extend("partition.rectangle", {
 
             setTimeout(function() {
               var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if (dblclick > 0) {
+              if( dblclick > 0 ) {
                 that.setAttribute("data-double", dblclick-1);
               } else {
                 chart.trigger("singleClick", event);
@@ -73,6 +71,7 @@ d3.chart("hierarchy").extend("partition.rectangle", {
 
   transform: function(root) {
     var chart = this;
+
     chart.root = root;
 
     return chart.d3.layout
@@ -115,13 +114,13 @@ d3.chart("hierarchy").extend("partition.rectangle", {
 
       t.selectAll("text")
         .attr("transform", function(d) { return chart.d3.transform(d, ky); })
-        .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; });
+        .style("opacity",  function(d) { return d.dx * ky > 12 ? 1 : 0; });
 
       node = d;
     }
   
-    return this;
+    return chart;
   },
-
 });
+
 

@@ -24,8 +24,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
       },
 
       insert: function() {
-        return this.append("g")
-          .classed("node", true);
+        return this.append("g").classed("node", true);
       },
 
       events: {
@@ -45,7 +44,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
             setTimeout(function() {
               var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if (dblclick > 0) {
+              if( dblclick > 0 ) {
                 that.setAttribute("data-double", dblclick-1);
               } else {
                 chart.trigger("singleClick", event);
@@ -62,13 +61,16 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
         "merge:transition": function() {
           this.select("circle")
-            .attr("r", function(d) { return chart._radius === "_COUNT" && d._children ? d._children.length
-                                                                                      : chart._radius === "_COUNT" && d.children ? d.children.length
-                                                                                      : chart._radius === "_COUNT" && ! d._children ? 1
-                                                                                      : chart._radius === "_COUNT" && ! d.children ? 1 : chart._radius; })
+            .attr("r", function(d) {
+                return chart._radius === "_COUNT" && d._children ? d._children.length
+                                                                 : chart._radius === "_COUNT" &&   d.children  ? d.children.length
+                                                                 : chart._radius === "_COUNT" && ! d._children ? 1
+                                                                 : chart._radius === "_COUNT" && ! d.children  ? 1 : chart._radius; })
             .style("stroke", function(d) { return d.path ? "brown" : "steelblue"; })
-            .style("fill", function(d) { return d.path && ! d.parent.path ? "#E2A76F"
-                                                                          : d._children ? "lightsteelblue" : "#fff"; });
+            .style("fill", function(d) {
+                return d.path && ! d.parent.path ? "#E2A76F"
+                                                 : d._children ? "lightsteelblue" : "#fff"; });
+
           this.select("text")
             .style("fill-opacity", 1);
         },
@@ -94,8 +96,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
       },
 
       insert: function() {
-        return this.append("path")
-          .classed("link", true);
+        return this.append("path").classed("link", true);
       },
 
       events: {
@@ -128,14 +129,14 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
 
   radius: function(_) {
-    if (!arguments.length) {
+    if( ! arguments.length ) {
       return this._radius;
     }
 
     this._radius = _;
 
     this.trigger("change:radius");
-    if (this.root) {
+    if( this.root ) {
       this.draw(this.root);
     }
 
@@ -153,12 +154,15 @@ d3.chart("hierarchy").extend("cluster-tree", {
       if (depth !== undefined) {
 
         chart.walker(
+
           chart.root,
+
           function(d) { if (d.depth == depth) { collapse(d); }},
+
           function(d) {
-            if (d.children && d.children.length > 0 && d.depth < depth) {
+            if( d.children && d.children.length > 0 && d.depth < depth ) {
               return d.children;
-            } else if (d._children && d._children.length > 0 && d.depth < depth) {
+            } else if( d._children && d._children.length > 0 && d.depth < depth ) {
               return d._children;
             } else {
               return null;
@@ -178,27 +182,27 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
 
     function toggle(d) {
-      if (d.children) {
+      if( d.children ) {
         d._children = d.children;
         d.children = null;
-      } else if (d._children) {
+      } else if( d._children ) {
         d.children = d._children;
         d._children = null;
       }
       return d;
     }
 
+
     function collapse(d) {
-      if (d.children) {
+      if( d.children ) {
         d._children = d.children;
         d._children.forEach(collapse);
         d.children = null;
       }
     }
 
-    return this;
+    return chart;
   },
-
 });
 
 

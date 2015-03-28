@@ -31,8 +31,7 @@ d3.chart("hierarchy").extend("partition.arc", {
     chart.layer("base", chart.layers.base, {
 
       dataBind: function(data) {
-        return this.selectAll("path")
-          .data(data);
+        return this.selectAll("path").data(data);
       },
 
       insert: function() {
@@ -49,7 +48,7 @@ d3.chart("hierarchy").extend("partition.arc", {
 
             setTimeout(function() {
               var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if (dblclick > 0) {
+              if( dblclick > 0 ) {
                 that.setAttribute("data-double", dblclick-1);
               } else {
                 chart.trigger("singleClick", event);
@@ -78,6 +77,7 @@ d3.chart("hierarchy").extend("partition.arc", {
 
   transform: function(root) {
     var chart = this;
+
     chart.root = root;
 
     return chart.d3.layout
@@ -87,14 +87,14 @@ d3.chart("hierarchy").extend("partition.arc", {
 
 
   diameter: function(_) {
-    if (!arguments.length) {
+    if( ! arguments.length ) {
       return this._diameter;
     }
 
     this._diameter = _ - 10;  
 
     this.trigger("change:radius");
-    if (this.root) {
+    if( this.root ) {
       this.draw(this.root);
     }
 
@@ -118,14 +118,14 @@ d3.chart("hierarchy").extend("partition.arc", {
       var xd = d3.interpolate(chart.d3.x.domain(), [d.x, d.x + d.dx]),
           yd = d3.interpolate(chart.d3.y.domain(), [d.y, 1]),
           yr = d3.interpolate(chart.d3.y.range(), [d.y ? 20 : 0, chart._diameter / 2]);
+
       return function(d, i) {
         return i ? function(t) { return chart.d3.arc(d); }
                  : function(t) { chart.d3.x.domain(xd(t)); chart.d3.y.domain(yd(t)).range(yr(t)); return chart.d3.arc(d); };
       };
     }
 
-    return this;
+    return chart;
   },
-
 });
 

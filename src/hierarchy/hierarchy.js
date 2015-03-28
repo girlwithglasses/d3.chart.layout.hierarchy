@@ -18,23 +18,21 @@ d3.chart("hierarchy", {
     this.duration(this._duration || 750);
 
 
-
     // http://bl.ocks.org/robschmuecker/7926762
-    this.walker = function (parent, walkerFunction, childrenFunction) {
-      if ( ! parent) {
+    this.walker = function(parent, walkerFunction, childrenFunction) {
+      if( ! parent ) {
         return;
       }
 
       walkerFunction(parent);
 
       var children = childrenFunction(parent);
-      if (children) {
+      if( children ) {
         for (var count = children.length, i = 0; i < count; i++) {
-          this.walker(children[i], walkerFunction, childrenFunction);
+          this.walker( children[i], walkerFunction, childrenFunction );
         }
       }
     };
-
   },
 
 
@@ -45,14 +43,14 @@ d3.chart("hierarchy", {
 
 
   name: function(_) {
-    if (!arguments.length) {
+    if( ! arguments.length ) {
       return this._name;
     }
 
     this._name = _;
 
     this.trigger("change:name");
-    if (this.root) {
+    if( this.root ) {
       this.draw(this.root);
     }
 
@@ -61,14 +59,14 @@ d3.chart("hierarchy", {
 
 
   value: function(_) {
-    if (!arguments.length) {
+    if( ! arguments.length ) {
       return this._value;
     }
 
     this._value = _;
 
     this.trigger("change:value");
-    if (this.root) {
+    if( this.root ) {
       this.draw(this.root);
     }
 
@@ -77,14 +75,14 @@ d3.chart("hierarchy", {
 
 
   duration: function(_) {
-    if (!arguments.length) {
+    if( ! arguments.length ) {
       return this._duration;
     }
 
     this._duration = _;
 
     this.trigger("change:duration");
-    if (this.root) {
+    if( this.root ) {
       this.draw(this.root);
     }
 
@@ -111,9 +109,9 @@ d3.chart("hierarchy", {
   sort: function(_) {
     var chart = this;
 
-    if (_ === "_ASC") {
+    if( _ === "_ASC" ) {
       chart.d3.layout.sort(function(a, b) { return d3.ascending(a[chart._name], b[chart._name] ); });
-    } else if (_ === "_DESC") {
+    } else if( _ === "_DESC" ) {
       chart.d3.layout.sort(function(a, b) { return d3.descending(a[chart._name], b[chart._name] ); });
     } else {
       chart.d3.layout.sort(_);
@@ -121,7 +119,6 @@ d3.chart("hierarchy", {
 
     return chart;
   },
-
 });
 
 

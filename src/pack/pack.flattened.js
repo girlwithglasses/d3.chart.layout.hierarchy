@@ -10,8 +10,8 @@ d3.chart("hierarchy").extend("pack.flattened", {
     chart._width  = chart.base.attr("width");
     chart._height = chart.base.attr("height");
 
-    chart.flatten(chart._flatten || null);
-    chart.formats(chart._formats || {});
+    chart.flatten(chart._flatten   || null);
+    chart.formats(chart._formats   || {});
     chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
 
     chart.d3.zoom.translate([(chart._width - chart._diameter) / 2, (chart._height - chart._diameter) / 2]);
@@ -54,7 +54,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
             setTimeout(function() {
               var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if (dblclick > 0) {
+              if( dblclick > 0 ) {
                 that.setAttribute("data-double", dblclick-1);
               } else {
                 chart.trigger("singleClick", event);
@@ -81,6 +81,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
   transform: function(root) {
     var chart = this;
+
     chart.root = root;
 
     return chart.d3.layout
@@ -93,14 +94,14 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
 
   diameter: function(_) {
-    if (!arguments.length) {
+    if( ! arguments.length ) {
       return this._diameter;
     }
 
     this._diameter = _ - 10;
 
     this.trigger("change:diameter");
-    if (this.root) {
+    if( this.root ) {
       this.draw(this.root);
     }
 
@@ -109,14 +110,14 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
 
   flatten: function(_) {
-    if (!arguments.length) {
+    if( ! arguments.length ) {
       return this._flatten;
     }
 
     this._flatten = _;
 
     this.trigger("change:flatten");
-    if (this.root) {
+    if( this.root ) {
       this.draw(this.root);
     }
 
@@ -125,10 +126,12 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
 
   formats: function(_) {
-    if (!arguments.length) {
+    if( ! arguments.length ) {
       return this._formats;
     }
+
     var chart = this;
+
     var color = d3.scale.category20c();
 
     ["title", "fill"].forEach(function(format) {
@@ -141,14 +144,13 @@ d3.chart("hierarchy").extend("pack.flattened", {
       }
     );
 
-    this.trigger("change:formats");
-    if (this.root) {
-      this.draw(this.root);
+    chart.trigger("change:formats");
+    if( chart.root ) {
+      chart.draw(chart.root);
     }
 
-    return this;
+    return chart;
   },
-
 });
 
 

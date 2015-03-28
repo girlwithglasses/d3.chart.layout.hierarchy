@@ -42,9 +42,10 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
   transform: function(root) {
     var chart = this,
         nodes;
+
     chart.source = root;
 
-    if ( ! chart.root) {
+    if( ! chart.root ) {
       chart.root    = root;
       chart.root.x0 = chart._height / 2;
       chart.root.y0 = 0;
@@ -74,18 +75,18 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
 
   margin: function(_) {
-    if (!arguments.length) {
+    if( ! arguments.length ) {
       return this._margin;
     }
 
     ["top", "right", "bottom", "left"].forEach(function(dimension) {
-      if (dimension in _) {
+      if( dimension in _ ) {
         this[dimension] = _[dimension];
       }
     }, this._margin = { top: 0, right: 0, bottom: 0, left: 0 });
 
     this.trigger("change:margin");
-    if (this.root) {
+    if( this.root ) {
       this.draw(this.root);
     }
 

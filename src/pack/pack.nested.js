@@ -44,7 +44,7 @@ d3.chart("hierarchy").extend("pack.nested", {
 
             setTimeout(function() {
               var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if (dblclick > 0) {
+              if( dblclick > 0 ) {
                 that.setAttribute("data-double", dblclick-1);
               } else {
                 chart.trigger("singleClick", event);
@@ -80,6 +80,7 @@ d3.chart("hierarchy").extend("pack.nested", {
 
   transform: function(root) {
     var chart = this;
+
     chart.root = root;
    
     return chart.d3.layout
@@ -90,14 +91,14 @@ d3.chart("hierarchy").extend("pack.nested", {
 
 
   diameter: function(_) {
-    if (!arguments.length) {
+    if( ! arguments.length ) {
       return this._diameter;
     }
 
     this._diameter = _ - 10;
 
     this.trigger("change:diameter");
-    if (this.root) {
+    if( this.root ) {
       this.draw(this.root);
     }
 
@@ -143,10 +144,8 @@ d3.chart("hierarchy").extend("pack.nested", {
       node = d;
     }
 
-    return this;
+    return chart;
   },
-
-
 });
 
 
