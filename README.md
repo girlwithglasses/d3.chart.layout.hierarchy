@@ -56,7 +56,7 @@ To build the project along with minified version of the library, run:
 
 ## Download Package
 
-If you do not want to install the packages, you can download them directly and embed them using script tags.
+If you do not want to install the package, you can download it directly and embed it using a script tag.
 
 `d3.chart.layout.hierarchy` depends on [`d3.chart`](http://misoproject.com/d3-chart/) which depends on [`D3`](http://d3js.org/), so include them in the reverse order:
 
