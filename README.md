@@ -53,3 +53,16 @@ To build the project along with minified version of the library, run:
     $ grunt release
 
 
+
+## Download Package
+
+If you do not want to install the packages, you can download them directly and embed them using script tags.
+
+`d3.chart.layout.hierarchy` depends on [`d3.chart`](http://misoproject.com/d3-chart/) which depends on [`D3`](http://d3js.org/), so include them in the reverse order:
+
+```javascript
+<script src="scripts/lib/d3.v3.min.js"></script>
+<script src="scripts/lib/d3.chart.min.js"></script>
+<script src="scripts/lib/d3.chart.layout.hierarchy.min.js"></script>
+```
+
