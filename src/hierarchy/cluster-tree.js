@@ -61,11 +61,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
         "merge:transition": function() {
           this.select("circle")
-            .attr("r", function(d) {
-                return chart._radius === "_COUNT" && d._children ? d._children.length
-                                                                 : chart._radius === "_COUNT" &&   d.children  ? d.children.length
-                                                                 : chart._radius === "_COUNT" && ! d._children ? 1
-                                                                 : chart._radius === "_COUNT" && ! d.children  ? 1 : chart._radius; })
+            .attr("r", chart._radius)
             .style("stroke", function(d) { return d.path ? "brown" : "steelblue"; })
             .style("fill", function(d) {
                 return d.path && ! d.parent.path ? "#E2A76F"
@@ -133,7 +129,19 @@ d3.chart("hierarchy").extend("cluster-tree", {
       return this._radius;
     }
 
-    this._radius = _;
+    if( _ === "_COUNT" ) {
+      this._radius = function(d) {
+        if( d._children ) {
+          return d._children.length;
+        } else if( d.children ) {
+          return d.children.length;
+        }
+        return 1;
+      };
+
+    } else {
+      this._radius = _;
+    }
 
     this.trigger("change:radius");
     if( this.root ) {
