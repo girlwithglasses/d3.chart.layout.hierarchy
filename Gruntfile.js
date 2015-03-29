@@ -53,15 +53,19 @@ module.exports = function(grunt) {
     },
 
     concat: {
-      stage: {
+      options: {
+        banner: "<%= meta.banner %>"
+      },
+      build: {
         files: {
-          "stage/parents.js": [
+          "d3.chart.layout.hierarchy.js": [
+            "src/start.js",
+
             "src/hierarchy/hierarchy.js",
             "src/hierarchy/cluster-tree.js",
             "src/hierarchy/cluster-tree.cartesian.js",
-            "src/hierarchy/cluster-tree.radial.js"
-          ],
-          "stage/children.js": [
+            "src/hierarchy/cluster-tree.radial.js",
+
             "src/cluster/cluster.cartesian.js",
             "src/cluster/cluster.radial.js",
             "src/pack/pack.flattened.js",
@@ -70,19 +74,8 @@ module.exports = function(grunt) {
             "src/partition/partition.rectangle.js",
             "src/tree/tree.cartesian.js",
             "src/tree/tree.radial.js",
-            "src/treemap/treemap.js"
-          ]
-        }
-      },
-      release: {
-        options: {
-          banner: "<%= meta.banner %>"
-        },
-        files: {
-          "d3.chart.layout.hierarchy.js": [
-            "src/start.js",
-            "stage/parents.js",
-            "stage/children.js",
+            "src/treemap/treemap.js",
+
             "src/end.js"
           ]
         }
