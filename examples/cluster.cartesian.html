@@ -41,10 +41,6 @@
     <script>
       (function() {
 
-        function radius(d) {
-          return Math.log(d.size);
-        }
-
         d3.json("data/flare.json", function(error, json) {
 
           var cluster = d3.select("#vis").append("svg")
