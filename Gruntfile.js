@@ -84,7 +84,7 @@ module.exports = function(grunt) {
 
     uglify: {
       options: {
-        preserveComments: "some"
+        preserveComments: "false"
       },
       release: {
         files: {

@@ -8,7 +8,7 @@ The input is a vertex-labeled rooted tree, and the output is a zoomable, collaps
 
 For more information [see the Wiki](https://github.com/bansaghi/d3.chart.layout.hierarchy/wiki).
 
-## Example Blocks
+## Example bl.ocks
 
 ##### Cluster Layout
 * [Cartesian Cluster](http://bl.ocks.org/bansaghi/ffc9d995f77e9ccd4ea9)
@@ -54,9 +54,9 @@ To build the project along with minified version of the library, run:
 
 
 
-## Download Package
+## Download
 
-If you do not want to install the package, you can download it directly and embed it using a script tag.
+If you do not want to install the library, you can download it directly and embed it using a script tag.
 
 `d3.chart.layout.hierarchy` depends on [`d3.Chart`](http://misoproject.com/d3-chart/) which depends on [`D3`](http://d3js.org/), so include these packages in the reverse order:
 

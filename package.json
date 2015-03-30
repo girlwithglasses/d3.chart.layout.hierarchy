@@ -1,7 +1,10 @@
 {
-  "version": "0.3.3",
   "name": "d3.chart.layout.hierarchy",
-  "description": "Reusable D3 hierarchy layouts built with d3.chart",
+  "description": "Reusable D3 hierarchy layouts built with d3.Chart",
+  "version": "0.3.3",
+
+  "main": "./d3.chart.layout.hierarchy.js",
+  "license": "BSD-3-Clause",
 
   "keywords": [
     "d3.js",
@@ -16,7 +19,7 @@
 
   "repository": {
     "type": "git",
-    "url": "https://github.com/bansaghi/d3.chart.layout.hierarchy"
+    "url": "git://github.com/bansaghi/d3.chart.layout.hierarchy.git"
   },
 
   "bugs": {
@@ -24,10 +27,8 @@
   },
   
   "directories": {
-    "example": "./examples"
+    "example": "./example"
   },
-
-  "main": "./d3.chart.layout.hierarchy.js",
 
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -45,9 +46,7 @@
   "scripts": {
     "test": "vows --spec"
   },
-
-  "license": "BSD-3-Clause",
-  
+ 
   "d3.chart": {
     "version" : "0.2.1"
   }
