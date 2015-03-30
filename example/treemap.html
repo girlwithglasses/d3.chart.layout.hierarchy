@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Treemap Example</title>
+    <script src="../bower_components/d3/d3.js"></script>
+    <script src="../bower_components/d3.chart/d3.chart.js"></script>
+    <script src="../d3.chart.layout.hierarchy.js"></script>
+    <style>
+      html {
+        display: table;
+        margin: auto;
+        width: 100%; }
+
+      #vis {
+        width: 70%;
+        height: 500px;
+        margin: auto; }
+
+      .cell text {
+        font: 10px sans-serif; }
+
+      .cell rect {  
+        stroke: #fff; }
+    </style>
+  </head>
+  <body>
+
+    <div id="vis"></div>
+
+    <script>
+      (function() {
+
+        d3.json("data/flare.json", function(error, json) {
+
+          var treemap = d3.select("#vis").append("svg")
+
+            .chart("treemap")
+
+              .value("size")
+              .sort("_DESC")
+              //.zoomable()
+              .collapsible()
+              //.duration()
+              ;
+
+          treemap.draw(json);
+
+        });
+      }());
+    </script>
+  </body>
+</html>
