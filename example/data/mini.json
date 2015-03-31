@@ -1,0 +1,16 @@
+{ "name": "Root", "value": 10,
+  "children": [
+   { "name": "Leaf 1", "value": 3 }, 
+   { "name": "Node 1", "value": 10,
+     "children": [
+       { "name": "Leaf 2", "value": 6 }, 
+       { "name": "Node 2", "value": 10,
+         "children": [
+           { "name": "Leaf 3", "value": 2 }, 
+           { "name": "Leaf 4", "value": 8 }
+         ]
+       }
+     ]
+   }
+  ]
+}
