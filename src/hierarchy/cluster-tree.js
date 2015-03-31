@@ -19,8 +19,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
     chart.layer("nodes", chart.layers.nodes, {
 
       dataBind: function(data) {
-        return this.selectAll(".node")
-          .data(data, function(d) { return d._id || (d._id = ++counter); });
+        return this.selectAll(".node").data(data, function(d) { return d._id || (d._id = ++counter); });
       },
 
       insert: function() {
@@ -159,13 +158,13 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
     chart.once("collapse:init", function() {
 
-      if (depth !== undefined) {
+      if( depth !== undefined ) {
 
         chart.walker(
 
           chart.root,
 
-          function(d) { if (d.depth == depth) { collapse(d); }},
+          function(d) { if( d.depth == depth ) { collapse(d); }},
 
           function(d) {
             if( d.children && d.children.length > 0 && d.depth < depth ) {
