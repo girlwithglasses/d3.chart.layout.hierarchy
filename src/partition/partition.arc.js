@@ -80,9 +80,7 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.root = root;
 
-    return chart.d3.layout
-      .value(function(d) { return chart._value === "_COUNT" ? 1 : d[chart._value]; })
-      .nodes(root);
+    return chart.d3.layout.nodes(root);
   },
 
 
@@ -117,7 +115,7 @@ d3.chart("hierarchy").extend("partition.arc", {
     function arcTween(d) {
       var xd = d3.interpolate(chart.d3.x.domain(), [d.x, d.x + d.dx]),
           yd = d3.interpolate(chart.d3.y.domain(), [d.y, 1]),
-          yr = d3.interpolate(chart.d3.y.range(), [d.y ? 20 : 0, chart._diameter / 2]);
+          yr = d3.interpolate(chart.d3.y.range(),  [d.y ? 20 : 0, chart._diameter / 2]);
 
       return function(d, i) {
         return i ? function(t) { return chart.d3.arc(d); }

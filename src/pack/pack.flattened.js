@@ -23,8 +23,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
     chart.layer("base", chart.layers.base, {
 
       dataBind: function(data) {
-        return this.selectAll(".node")
-          .data(data.filter(function(d) { return ! d.children; }));
+        return this.selectAll(".node").data(data.filter(function(d) { return ! d.children; }));
       },
 
       insert: function() {
@@ -88,7 +87,6 @@ d3.chart("hierarchy").extend("pack.flattened", {
       .size([chart._diameter, chart._diameter])
       .sort(null)
       .padding(1.5)
-      .value(function(d) { return chart._value === "_COUNT" ? 1 : d[chart._value]; })
       .nodes(chart._flatten ? chart._flatten(root) : root);
   },
 
@@ -135,7 +133,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
     var color = d3.scale.category20c();
 
     ["title", "fill"].forEach(function(format) {
-      if (format in _) {
+      if( format in _ ) {
         this[format] = d3.functor(_[format]);
       }
     }, this._formats = {
