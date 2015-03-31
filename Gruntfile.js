@@ -58,10 +58,12 @@ module.exports = function(grunt) {
       },
       build: {
         files: {
-          "d3.chart.layout.hierarchy.js": [
+          "d3.chart.layout.hierarchy.js":
+          [
             "src/start.js",
 
             "src/hierarchy/hierarchy.js",
+
             "src/hierarchy/cluster-tree.js",
             "src/hierarchy/cluster-tree.cartesian.js",
             "src/hierarchy/cluster-tree.radial.js",
