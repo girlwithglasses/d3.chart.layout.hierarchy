@@ -61,8 +61,6 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
 
     nodes = chart.d3.layout.nodes(chart.root).reverse();
 
-    //nodes.forEach(function(d) { d.y = d.depth * 180; });
-
     chart.on("transform:stash", function() {
       nodes.forEach(function(d) {
         d.x0 = d.x;

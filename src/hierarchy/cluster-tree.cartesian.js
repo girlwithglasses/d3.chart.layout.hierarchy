@@ -57,11 +57,7 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
       chart.trigger("collapse:init");
     }
 
-    nodes = chart.d3.layout
-      //.size([chart._height, chart._width])
-      .nodes(chart.root).reverse();
-
-//    nodes.forEach(function(d) { d.y = d.depth * 180; });
+    nodes = chart.d3.layout.nodes(chart.root).reverse();
 
     chart.on("transform:stash", function() {
       nodes.forEach(function(d) {
