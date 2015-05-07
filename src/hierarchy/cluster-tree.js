@@ -8,6 +8,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
     var counter = 0;
 
     chart.radius(chart._radius || 4.5);
+    chart.levelGap(chart._levelGap || "auto");
 
     chart._width  = chart.base.attr("width");
     chart._height = chart.base.attr("height");
@@ -107,6 +108,20 @@ d3.chart("hierarchy").extend("cluster-tree", {
   },
 
 
+
+  transform: function(nodes) {
+    var chart = this;
+
+    // Adjust gap between node levels.
+    if( chart._levelGap && chart._levelGap !== "auto" ) {
+      nodes.forEach(function (d) { d.y = d.depth * chart._levelGap; });
+    }
+    
+    return nodes;
+  },
+
+
+
   radius: function(_) {
     if( ! arguments.length ) {
       return this._radius;
@@ -127,6 +142,32 @@ d3.chart("hierarchy").extend("cluster-tree", {
     }
 
     this.trigger("change:radius");
+    if( this.root ) {
+      this.draw(this.root);
+    }
+
+    return this;
+  },
+
+
+  /**
+   * Sets a gap between node levels. Acceps eithe number of pixels or string
+   * "auto". When level gap set to "auto", gap between node levels will be
+   * maximized, so the tree takes full width.
+   * 
+   * @author: Basil Gren @basgren
+   *
+   * @param _
+   * @returns {*}
+   */
+  levelGap: function(_) {
+    if( ! arguments.length ) {
+      return this._levelGap;
+    }
+
+    this._levelGap = _;
+    this.trigger("change:levelGap");
+
     if( this.root ) {
       this.draw(this.root);
     }
