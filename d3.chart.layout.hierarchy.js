@@ -181,24 +181,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
             .text(function(d) { return d[chart._name]; })
             .style("fill-opacity", 0);
 
-          // http://stackoverflow.com/questions/1067464/need-to-cancel-click-mouseup-events-when-double-click-event-detected/1067484#1067484
           this.on("click", function(event) {
-            var that = this;
-
-            setTimeout(function() {
-              var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if( dblclick > 0 ) {
-                that.setAttribute("data-double", dblclick-1);
-              } else {
-                chart.trigger("singleClick", event);
-              }
-            }, 300);
-            d3.event.stopPropagation();
-
-          }).on("dblclick", function(event) {
-            this.setAttribute("data-double", 2);
-            chart.trigger("doubleClick", event);
-            d3.event.stopPropagation();
+            chart.trigger("node:click", event);
           });
         },
 
@@ -325,7 +309,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
 
 
-    chart.on("singleClick", function(d) {
+    chart.on("node:click", function(d) {
       d = toggle(d);
       chart.trigger("transform:stash");
       chart.draw(d);
@@ -617,22 +601,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
             .text(chart._formats.title);
 
           this.on("click", function(event) {
-            var that = this;
-
-            setTimeout(function() {
-              var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if( dblclick > 0 ) {
-                that.setAttribute("data-double", dblclick-1);
-              } else {
-                chart.trigger("singleClick", event);
-              }
-            }, 300);
-            d3.event.stopPropagation();
-
-          }).on("dblclick", function(event) {
-            this.setAttribute("data-double", 2);
-            chart.trigger("doubleClick", event);
-            d3.event.stopPropagation();
+            chart.trigger("node:click", event);
           });
         },
       }
@@ -762,22 +731,7 @@ d3.chart("hierarchy").extend("pack.nested", {
             .style("text-anchor", "middle");
 
           this.on("click", function(event) {
-            var that = this;
-
-            setTimeout(function() {
-              var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if( dblclick > 0 ) {
-                that.setAttribute("data-double", dblclick-1);
-              } else {
-                chart.trigger("singleClick", event);
-              }
-            }, 300);
-            d3.event.stopPropagation();
-
-          }).on("dblclick", function(event) {
-            this.setAttribute("data-double", 2);
-            chart.trigger("doubleClick", event);
-            d3.event.stopPropagation();
+            chart.trigger("node:click", event);
           });
         },
 
@@ -837,11 +791,8 @@ d3.chart("hierarchy").extend("pack.nested", {
 
     chart.layers.base.on("merge", function() {
       node = chart.root;
-      chart.on("singleClick", function(d) { collapse(node == d ? chart.root : d); });
+      chart.on("node:click", function(d) { collapse(node == d ? chart.root : d); });
     });
-
-    chart.base.on("click", function() { collapse(chart.root); });
-//    d3.select(window).on("click", function() { collapse(chart.root); });
 
 
     function collapse(d) {
@@ -917,22 +868,7 @@ d3.chart("hierarchy").extend("partition.arc", {
             .style("fill", function(d) { return chart.d3.color((d.children ? d : d.parent)[chart._name]); });
 
           this.on("click", function(event) {
-            var that = this;
-
-            setTimeout(function() {
-              var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if( dblclick > 0 ) {
-                that.setAttribute("data-double", dblclick-1);
-              } else {
-                chart.trigger("singleClick", event);
-              }
-            }, 300);
-            d3.event.stopPropagation();
-
-          }).on("dblclick", function(event) {
-            this.setAttribute("data-double", 2);
-            chart.trigger("doubleClick", event);
-            d3.event.stopPropagation();
+            chart.trigger("path:click", event);
           });
         }
       }
@@ -978,7 +914,7 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.layers.base.on("merge", function() {
       var path = this;
-      chart.on("singleClick", function(d) {
+      chart.on("path:click", function(d) {
           path.transition()
             .duration(chart._duration)
             .attrTween("d", arcTween(d));
@@ -1048,22 +984,7 @@ d3.chart("hierarchy").extend("partition.rectangle", {
             .text(function(d) { return d[chart._name]; });
 
           this.on("click", function(event) {
-            var that = this;
-
-            setTimeout(function() {
-              var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if( dblclick > 0 ) {
-                that.setAttribute("data-double", dblclick-1);
-              } else {
-                chart.trigger("singleClick", event);
-              }
-            }, 300);
-            d3.event.stopPropagation();
-
-          }).on("dblclick", function(event) {
-            this.setAttribute("data-double", 2);
-            chart.trigger("doubleClick", event);
-            d3.event.stopPropagation();
+            chart.trigger("rect:click", event);
           });
         }
       }
@@ -1090,11 +1011,8 @@ d3.chart("hierarchy").extend("partition.rectangle", {
 
     chart.layers.base.on("merge", function() {
       node = chart.root;
-      chart.on("singleClick", function(d) { collapse(node == d ? chart.root : d); });
+      chart.on("rect:click", function(d) { collapse(node == d ? chart.root : d); });
     });
-
-    chart.base.on("click", function() { collapse(chart.root); });
-
 
     function collapse(d) {
       var kx = (d.y ? chart._width - 40 : chart._width) / (1 - d.y),
@@ -1184,22 +1102,7 @@ d3.chart("hierarchy").extend("treemap", {
             .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; });
 
           this.on("click", function(event) {
-            var that = this;
-
-            setTimeout(function() {
-              var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if( dblclick > 0 ) {
-                that.setAttribute("data-double", dblclick-1);
-              } else {
-                chart.trigger("singleClick", event);
-              }
-            }, 300);
-            d3.event.stopPropagation();
-
-          }).on("dblclick", function(event) {
-            this.setAttribute("data-double", 2);
-            chart.trigger("doubleClick", event);
-            d3.event.stopPropagation();
+            chart.trigger("rect:click", event);
           });
         },
       }
@@ -1229,11 +1132,8 @@ d3.chart("hierarchy").extend("treemap", {
 
     chart.layers.base.on("merge", function() {
       node = chart.root;
-      chart.on("singleClick", function(d) { collapse(node == d.parent ? chart.root : d.parent); });
+      chart.on("rect:click", function(d) { collapse(node == d.parent ? chart.root : d.parent); });
     });
-
-    chart.base.on("click", function() { collapse(chart.root); });
-
 
     function collapse(d) {
       var kx = chart._width  / d.dx,

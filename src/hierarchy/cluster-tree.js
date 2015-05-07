@@ -37,24 +37,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
             .text(function(d) { return d[chart._name]; })
             .style("fill-opacity", 0);
 
-          // http://stackoverflow.com/questions/1067464/need-to-cancel-click-mouseup-events-when-double-click-event-detected/1067484#1067484
           this.on("click", function(event) {
-            var that = this;
-
-            setTimeout(function() {
-              var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if( dblclick > 0 ) {
-                that.setAttribute("data-double", dblclick-1);
-              } else {
-                chart.trigger("singleClick", event);
-              }
-            }, 300);
-            d3.event.stopPropagation();
-
-          }).on("dblclick", function(event) {
-            this.setAttribute("data-double", 2);
-            chart.trigger("doubleClick", event);
-            d3.event.stopPropagation();
+            chart.trigger("node:click", event);
           });
         },
 
@@ -181,7 +165,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
 
 
-    chart.on("singleClick", function(d) {
+    chart.on("node:click", function(d) {
       d = toggle(d);
       chart.trigger("transform:stash");
       chart.draw(d);

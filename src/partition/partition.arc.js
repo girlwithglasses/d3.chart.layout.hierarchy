@@ -44,22 +44,7 @@ d3.chart("hierarchy").extend("partition.arc", {
             .style("fill", function(d) { return chart.d3.color((d.children ? d : d.parent)[chart._name]); });
 
           this.on("click", function(event) {
-            var that = this;
-
-            setTimeout(function() {
-              var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if( dblclick > 0 ) {
-                that.setAttribute("data-double", dblclick-1);
-              } else {
-                chart.trigger("singleClick", event);
-              }
-            }, 300);
-            d3.event.stopPropagation();
-
-          }).on("dblclick", function(event) {
-            this.setAttribute("data-double", 2);
-            chart.trigger("doubleClick", event);
-            d3.event.stopPropagation();
+            chart.trigger("path:click", event);
           });
         }
       }
@@ -105,7 +90,7 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.layers.base.on("merge", function() {
       var path = this;
-      chart.on("singleClick", function(d) {
+      chart.on("path:click", function(d) {
           path.transition()
             .duration(chart._duration)
             .attrTween("d", arcTween(d));

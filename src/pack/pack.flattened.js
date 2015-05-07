@@ -49,22 +49,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
             .text(chart._formats.title);
 
           this.on("click", function(event) {
-            var that = this;
-
-            setTimeout(function() {
-              var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if( dblclick > 0 ) {
-                that.setAttribute("data-double", dblclick-1);
-              } else {
-                chart.trigger("singleClick", event);
-              }
-            }, 300);
-            d3.event.stopPropagation();
-
-          }).on("dblclick", function(event) {
-            this.setAttribute("data-double", 2);
-            chart.trigger("doubleClick", event);
-            d3.event.stopPropagation();
+            chart.trigger("node:click", event);
           });
         },
       }

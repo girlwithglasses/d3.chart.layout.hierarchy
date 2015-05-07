@@ -39,22 +39,7 @@ d3.chart("hierarchy").extend("pack.nested", {
             .style("text-anchor", "middle");
 
           this.on("click", function(event) {
-            var that = this;
-
-            setTimeout(function() {
-              var dblclick = parseInt(that.getAttribute("data-double"), 10);
-              if( dblclick > 0 ) {
-                that.setAttribute("data-double", dblclick-1);
-              } else {
-                chart.trigger("singleClick", event);
-              }
-            }, 300);
-            d3.event.stopPropagation();
-
-          }).on("dblclick", function(event) {
-            this.setAttribute("data-double", 2);
-            chart.trigger("doubleClick", event);
-            d3.event.stopPropagation();
+            chart.trigger("node:click", event);
           });
         },
 
@@ -114,11 +99,8 @@ d3.chart("hierarchy").extend("pack.nested", {
 
     chart.layers.base.on("merge", function() {
       node = chart.root;
-      chart.on("singleClick", function(d) { collapse(node == d ? chart.root : d); });
+      chart.on("node:click", function(d) { collapse(node == d ? chart.root : d); });
     });
-
-    chart.base.on("click", function() { collapse(chart.root); });
-//    d3.select(window).on("click", function() { collapse(chart.root); });
 
 
     function collapse(d) {
