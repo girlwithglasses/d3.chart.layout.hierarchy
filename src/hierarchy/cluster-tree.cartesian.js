@@ -15,8 +15,8 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
         .attr("transform", function(d) { return "translate(" + chart.source.y0 + "," + chart.source.x0 + ")"; });
 
       this.select("text")
-        .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
-        .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; });
+        .attr("x", function(d) { return d.isLeaf ? 10 : -10; })
+        .attr("text-anchor", function(d) { return d.isLeaf ? "start" : "end"; });
     });
 
     chart.layers.nodes.on("merge:transition", function() {
