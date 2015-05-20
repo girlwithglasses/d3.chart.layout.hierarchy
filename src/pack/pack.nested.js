@@ -8,6 +8,7 @@ d3.chart("hierarchy").extend("pack.nested", {
 
     chart._width  = chart.base.attr("width");
     chart._height = chart.base.attr("height");
+
     chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
 
     chart.d3.zoom.translate([(chart._width - chart._diameter) / 2, (chart._height - chart._diameter) / 2]);
@@ -19,33 +20,33 @@ d3.chart("hierarchy").extend("pack.nested", {
     chart.layer("base", chart.layers.base, {
 
       dataBind: function(data) {
-        return this.selectAll(".node").data(data);
+        return this.selectAll(".pack").data(data);
       },
 
       insert: function() {
-        return this.append("g");
+        return this.append("g").classed("pack", true);
       },
 
       events: {
-        enter: function() {
+        "enter": function() {
+          
+          chart._initNode(this);
 
           this.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
           this.append("circle")
             .attr("r", function(d) { return d.r; });
 
-          this.append("text")
-            .attr("dy", ".3em")
-            .style("text-anchor", "middle");
+          this.append("text");
 
           this.on("click", function(event) {
-            chart.trigger("node:click", event);
+            chart.trigger("pack:click", event);
           });
         },
 
-        merge: function() {
+        "merge": function() {
 
-          this.attr("class", function(d) { return d.children ? "node parent" : "node child"; });
+          chart._initNode(this);
 
           this.select("text")
             .style("opacity", function(d) { return d.r > 20 ? 1 : 0; })
@@ -92,14 +93,14 @@ d3.chart("hierarchy").extend("pack.nested", {
   collapsible: function() {
     var chart = this;
 
-    var node,
+    var pack,
         x = d3.scale.linear().range([0, chart._diameter]),
         y = d3.scale.linear().range([0, chart._diameter]);
 
 
     chart.layers.base.on("merge", function() {
-      node = chart.root;
-      chart.on("node:click", function(d) { collapse(node == d ? chart.root : d); });
+      pack = chart.root;
+      chart.on("pack:click", function(d) { collapse(pack == d ? chart.root : d); });
     });
 
 
@@ -112,7 +113,7 @@ d3.chart("hierarchy").extend("pack.nested", {
       var t = chart.layers.base.transition()
         .duration(chart._duration);
 
-      t.selectAll(".node")
+      t.selectAll(".pack")
         .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
 
       t.selectAll("circle")
@@ -121,7 +122,7 @@ d3.chart("hierarchy").extend("pack.nested", {
       t.selectAll("text")
         .style("opacity", function(d) { return k * d.r > 20 ? 1 : 0; });
 
-      node = d;
+      pack = d;
     }
 
     return chart;

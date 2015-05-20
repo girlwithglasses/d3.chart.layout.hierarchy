@@ -24,17 +24,20 @@ d3.chart("hierarchy").extend("partition.rectangle", {
       },
 
       insert: function() {
-        return this.append("g").classed("partition", true)
-          .attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; });
+        return this.append("g").classed("partition", true);
       },
 
       events: {
-        enter: function() {
+        "enter": function() {
+
+          chart._initNode(this);
+          
+          this.attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; });
+
           var kx = chart._width  / chart.root.dx,
               ky = chart._height / 1; 
 
           this.append("rect")
-            .attr("class", function(d) { return d.children ? "parent" : "child"; })
             .attr("width", chart.root.dy * kx)
             .attr("height", function(d) { return d.dx * ky; }); 
 
