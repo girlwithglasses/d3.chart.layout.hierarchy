@@ -10,8 +10,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
     chart._width  = chart.base.attr("width");
     chart._height = chart.base.attr("height");
 
-    chart.flatten(chart._flatten   || null);
-    chart.formats(chart._formats   || {});
+    chart.bubble(chart._bubble     || {});
     chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
 
     chart.d3.zoom.translate([(chart._width - chart._diameter) / 2, (chart._height - chart._diameter) / 2]);
@@ -23,11 +22,11 @@ d3.chart("hierarchy").extend("pack.flattened", {
     chart.layer("base", chart.layers.base, {
 
       dataBind: function(data) {
-        return this.selectAll(".node").data(data.filter(function(d) { return ! d.children; }));
+        return this.selectAll(".pack").data(data.filter(function(d) { return ! d.children; }));
       },
 
       insert: function() {
-        return this.append("g");
+        return this.append("g").classed("pack", true);
       },
 
       events: {
@@ -37,19 +36,17 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
           this.append("circle")
             .attr("r", function(d) { return d.r; })
-            .style("stroke", "#aaa")
-            .style("fill", chart._formats.fill);
+            .style("fill", function(d) { return chart.d3.colorScale(chart._bubble.pack(d)); });
 
           this.append("text")
             .attr("dy", ".3em")
-            .style("text-anchor", "middle")
             .text(function(d) { return d[chart._name].substring(0, d.r / 3); });
 
           this.append("title")
-            .text(chart._formats.title);
+            .text(chart._bubble.title);
 
           this.on("click", function(event) {
-            chart.trigger("node:click", event);
+            chart.trigger("pack:click", event);
           });
         },
       }
@@ -72,7 +69,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
       .size([chart._diameter, chart._diameter])
       .sort(null)
       .padding(1.5)
-      .nodes(chart._flatten ? chart._flatten(root) : root);
+      .nodes(chart._bubble.flatten ? chart._bubble.flatten(root) : root);
   },
 
 
@@ -92,38 +89,21 @@ d3.chart("hierarchy").extend("pack.flattened", {
   },
 
 
-  flatten: function(_) {
+  bubble: function(_) {
     if( ! arguments.length ) {
-      return this._flatten;
-    }
-
-    this._flatten = _;
-
-    this.trigger("change:flatten");
-    if( this.root ) {
-      this.draw(this.root);
-    }
-
-    return this;
-  },
-
-
-  formats: function(_) {
-    if( ! arguments.length ) {
-      return this._formats;
+      return this._bubble;
     }
 
     var chart = this;
 
-    var color = d3.scale.category20c();
-
-    ["title", "fill"].forEach(function(format) {
-      if( format in _ ) {
-        this[format] = d3.functor(_[format]);
+    ["flatten", "title", "pack"].forEach(function(func) {
+      if( func in _ ) {
+        this[func] = d3.functor(_[func]);
       }
-    }, this._formats = {
-       title : function(d) { return d[chart._value]; },
-       fill  : function(d) { return color(d[chart._name]); }
+    }, this._bubble = {
+       flatten : null,
+       title   : function(d) { return d[chart._value]; },
+       pack    : function(d) { return d[chart._name]; }
       }
     );
 
@@ -134,6 +114,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
     return chart;
   },
+
 });
 
 

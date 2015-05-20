@@ -13,17 +13,22 @@
         width: 100%; }
 
       #vis {
-        width: 70%;
-        height: 800px;
+        width: 50%;
+        height: 700px;
         margin: auto; }
 
-      .node {
+      .node.non-leaf {
         cursor: pointer; }
 
       .node circle {
-        fill: #fff;
         stroke: steelblue;
         stroke-width: 1.5px; }
+
+      .node.leaf circle {
+        fill: #fff; }
+
+      .node.non-leaf circle {
+        fill: lightsteelblue; }
 
       .node text {
         font-size: 11px; }
@@ -48,7 +53,7 @@
             .chart("tree.radial")
 
               //.diameter(500)
-              .value("size")
+              //.value("size")
               .radius(3)
               .levelGap(100)
               .zoomable([0.1, 3])

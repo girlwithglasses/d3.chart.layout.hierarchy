@@ -16,12 +16,14 @@ d3.chart("hierarchy", {
   initialize: function() {
     var chart = this;
 
-    chart.d3      = {};
-    chart.layers  = {};
+    chart.d3     = {};
+    chart.layers = {};
 
 
     chart.base.attr("width",  chart.base.node().parentElement.clientWidth);
     chart.base.attr("height", chart.base.node().parentElement.clientHeight);
+
+    chart.d3.colorScale = chart._colors ? d3.scale.ordinal().range(chart._colors) : d3.scale.category20c();
 
     chart.d3.zoom = d3.behavior.zoom();
     chart.layers.base = chart.base.append("g");
@@ -37,8 +39,13 @@ d3.chart("hierarchy", {
     });
 
 
+    chart.on("change:colors", function() {
+      chart.d3.colorScale = d3.scale.ordinal().range(chart._colors);
+    });
+
+
     // http://bl.ocks.org/robschmuecker/7926762
-    chart.walker = function(parent, walkerFunction, childrenFunction) {
+    chart._walker = function(parent, walkerFunction, childrenFunction) {
       if( ! parent ) {
         return;
       }
@@ -48,16 +55,47 @@ d3.chart("hierarchy", {
       var children = childrenFunction(parent);
       if( children ) {
         for( var count = children.length, i = 0; i < count; i++ ) {
-          chart.walker( children[i], walkerFunction, childrenFunction );
+          chart._walker( children[i], walkerFunction, childrenFunction );
         }
       }
+    };
+
+
+    /**
+     * Initializes node attributes.
+     *
+     * @param node SVG element that represents node.
+     * @private
+     */
+    chart._initNode= function(node) {
+      node
+        .classed("leaf", function(d) { return d.isLeaf; })
+        .classed("non-leaf", function(d) { return ! d.isLeaf; });
     };
   },
 
 
 
-  transform: function(root) {
-    return root;
+  transform: function(nodes) {
+    // Before we proceed, mark leaf nodes on tree
+    this._walker(
+
+      this.root,
+      
+      function(d) { d.isLeaf = ! d.children && ! d._children; },
+      
+      function(d) {
+        if( d.children && d.children.length > 0 ) {
+          return d.children;
+        } else if( d._children && d._children.length > 0 ) {
+          return d._children;
+        } else {
+          return null;
+        }
+      }
+    );
+
+    return nodes;
   },
 
 
@@ -90,6 +128,22 @@ d3.chart("hierarchy", {
     }
 
     return this;
+  },
+
+
+  colors: function(_) {
+    if( ! arguments.length ) {
+      return this._colors;
+    }
+
+    this._colors = _;
+
+    this.trigger("change:colors");
+    if( this.root ) {
+      this.draw(this.root);
+    }
+
+    return this;    
   },
 
 
@@ -173,9 +227,11 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
       events: {
         "enter": function() {
+
+          chart._initNode(this);
+
           this.append("circle")
-            .attr("r", 0)
-            .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+            .attr("r", 0);
 
           this.append("text")
             .attr("dy", ".35em")
@@ -187,13 +243,14 @@ d3.chart("hierarchy").extend("cluster-tree", {
           });
         },
 
+        "merge": function() {
+          chart._initNode(this);
+        },
+
         "merge:transition": function() {
           this.select("circle")
-            .attr("r", chart._radius)
-            .style("stroke", function(d) { return d.path ? "brown" : "steelblue"; })
-            .style("fill", function(d) {
-                return d.path && ! d.parent.path ? "#E2A76F"
-                                                 : d._children ? "lightsteelblue" : "#fff"; });
+            .attr()
+            .attr("r", chart._radius);
 
           this.select("text")
             .style("fill-opacity", 1);
@@ -234,9 +291,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
         "merge:transition": function() {
           this.duration(chart._duration)
-            .attr("d", chart.d3.diagonal)
-            .attr("stroke", function(d) { return d.source.path && d.target.path ? "#dd7b7b" : "#ccc"; })
-            .style("stroke-width", function(d) { return d.path ? 1 : 1.5; });
+            .attr("d", chart.d3.diagonal);
         },
 
         "exit:transition": function() {
@@ -329,7 +384,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
       if( depth !== undefined ) {
 
-        chart.walker(
+        chart._walker(
 
           chart.root,
 
@@ -400,8 +455,8 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
         .attr("transform", function(d) { return "translate(" + chart.source.y0 + "," + chart.source.x0 + ")"; });
 
       this.select("text")
-        .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
-        .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; });
+        .attr("x", function(d) { return d.isLeaf ? 10 : -10; })
+        .attr("text-anchor", function(d) { return d.isLeaf ? "start" : "end"; });
     });
 
     chart.layers.nodes.on("merge:transition", function() {
@@ -586,6 +641,22 @@ d3.chart("cluster-tree.radial").extend("cluster.radial", {
 });
 
 
+d3.chart("cluster-tree.cartesian").extend("tree.cartesian", {
+
+  initialize : function() {
+    this.d3.layout = d3.layout.tree();
+  },
+});
+
+
+d3.chart("cluster-tree.radial").extend("tree.radial", {
+
+  initialize : function() {
+    this.d3.layout = d3.layout.tree();
+  }
+});
+
+
 d3.chart("hierarchy").extend("pack.flattened", {
 
   initialize : function() {
@@ -597,8 +668,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
     chart._width  = chart.base.attr("width");
     chart._height = chart.base.attr("height");
 
-    chart.flatten(chart._flatten   || null);
-    chart.formats(chart._formats   || {});
+    chart.bubble(chart._bubble     || {});
     chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
 
     chart.d3.zoom.translate([(chart._width - chart._diameter) / 2, (chart._height - chart._diameter) / 2]);
@@ -610,11 +680,11 @@ d3.chart("hierarchy").extend("pack.flattened", {
     chart.layer("base", chart.layers.base, {
 
       dataBind: function(data) {
-        return this.selectAll(".node").data(data.filter(function(d) { return ! d.children; }));
+        return this.selectAll(".pack").data(data.filter(function(d) { return ! d.children; }));
       },
 
       insert: function() {
-        return this.append("g");
+        return this.append("g").classed("pack", true);
       },
 
       events: {
@@ -624,19 +694,17 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
           this.append("circle")
             .attr("r", function(d) { return d.r; })
-            .style("stroke", "#aaa")
-            .style("fill", chart._formats.fill);
+            .style("fill", function(d) { return chart.d3.colorScale(chart._bubble.pack(d)); });
 
           this.append("text")
             .attr("dy", ".3em")
-            .style("text-anchor", "middle")
             .text(function(d) { return d[chart._name].substring(0, d.r / 3); });
 
           this.append("title")
-            .text(chart._formats.title);
+            .text(chart._bubble.title);
 
           this.on("click", function(event) {
-            chart.trigger("node:click", event);
+            chart.trigger("pack:click", event);
           });
         },
       }
@@ -659,7 +727,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
       .size([chart._diameter, chart._diameter])
       .sort(null)
       .padding(1.5)
-      .nodes(chart._flatten ? chart._flatten(root) : root);
+      .nodes(chart._bubble.flatten ? chart._bubble.flatten(root) : root);
   },
 
 
@@ -679,38 +747,21 @@ d3.chart("hierarchy").extend("pack.flattened", {
   },
 
 
-  flatten: function(_) {
+  bubble: function(_) {
     if( ! arguments.length ) {
-      return this._flatten;
-    }
-
-    this._flatten = _;
-
-    this.trigger("change:flatten");
-    if( this.root ) {
-      this.draw(this.root);
-    }
-
-    return this;
-  },
-
-
-  formats: function(_) {
-    if( ! arguments.length ) {
-      return this._formats;
+      return this._bubble;
     }
 
     var chart = this;
 
-    var color = d3.scale.category20c();
-
-    ["title", "fill"].forEach(function(format) {
-      if( format in _ ) {
-        this[format] = d3.functor(_[format]);
+    ["flatten", "title", "pack"].forEach(function(func) {
+      if( func in _ ) {
+        this[func] = d3.functor(_[func]);
       }
-    }, this._formats = {
-       title : function(d) { return d[chart._value]; },
-       fill  : function(d) { return color(d[chart._name]); }
+    }, this._bubble = {
+       flatten : null,
+       title   : function(d) { return d[chart._value]; },
+       pack    : function(d) { return d[chart._name]; }
       }
     );
 
@@ -721,6 +772,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
     return chart;
   },
+
 });
 
 
@@ -735,6 +787,7 @@ d3.chart("hierarchy").extend("pack.nested", {
 
     chart._width  = chart.base.attr("width");
     chart._height = chart.base.attr("height");
+
     chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
 
     chart.d3.zoom.translate([(chart._width - chart._diameter) / 2, (chart._height - chart._diameter) / 2]);
@@ -746,33 +799,33 @@ d3.chart("hierarchy").extend("pack.nested", {
     chart.layer("base", chart.layers.base, {
 
       dataBind: function(data) {
-        return this.selectAll(".node").data(data);
+        return this.selectAll(".pack").data(data);
       },
 
       insert: function() {
-        return this.append("g");
+        return this.append("g").classed("pack", true);
       },
 
       events: {
-        enter: function() {
+        "enter": function() {
+          
+          chart._initNode(this);
 
           this.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
           this.append("circle")
             .attr("r", function(d) { return d.r; });
 
-          this.append("text")
-            .attr("dy", ".3em")
-            .style("text-anchor", "middle");
+          this.append("text");
 
           this.on("click", function(event) {
-            chart.trigger("node:click", event);
+            chart.trigger("pack:click", event);
           });
         },
 
-        merge: function() {
+        "merge": function() {
 
-          this.attr("class", function(d) { return d.children ? "node parent" : "node child"; });
+          chart._initNode(this);
 
           this.select("text")
             .style("opacity", function(d) { return d.r > 20 ? 1 : 0; })
@@ -819,14 +872,14 @@ d3.chart("hierarchy").extend("pack.nested", {
   collapsible: function() {
     var chart = this;
 
-    var node,
+    var pack,
         x = d3.scale.linear().range([0, chart._diameter]),
         y = d3.scale.linear().range([0, chart._diameter]);
 
 
     chart.layers.base.on("merge", function() {
-      node = chart.root;
-      chart.on("node:click", function(d) { collapse(node == d ? chart.root : d); });
+      pack = chart.root;
+      chart.on("pack:click", function(d) { collapse(pack == d ? chart.root : d); });
     });
 
 
@@ -839,7 +892,7 @@ d3.chart("hierarchy").extend("pack.nested", {
       var t = chart.layers.base.transition()
         .duration(chart._duration);
 
-      t.selectAll(".node")
+      t.selectAll(".pack")
         .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
 
       t.selectAll("circle")
@@ -848,7 +901,7 @@ d3.chart("hierarchy").extend("pack.nested", {
       t.selectAll("text")
         .style("opacity", function(d) { return k * d.r > 20 ? 1 : 0; });
 
-      node = d;
+      pack = d;
     }
 
     return chart;
@@ -871,11 +924,9 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
 
-
-    chart.d3.color = d3.scale.category20c();
-    chart.d3.x     = d3.scale.linear().range([0, 2 * Math.PI]);
-    chart.d3.y     = d3.scale.sqrt().range([0, chart._diameter / 2]);
-    chart.d3.arc   = d3.svg.arc()
+    chart.d3.x   = d3.scale.linear().range([0, 2 * Math.PI]);
+    chart.d3.y   = d3.scale.sqrt().range([0, chart._diameter / 2]);
+    chart.d3.arc = d3.svg.arc()
       .startAngle(function(d)  { return Math.max(0, Math.min(2 * Math.PI, chart.d3.x(d.x))); })
       .endAngle(function(d)    { return Math.max(0, Math.min(2 * Math.PI, chart.d3.x(d.x + d.dx))); })
       .innerRadius(function(d) { return Math.max(0, chart.d3.y(d.y)); })
@@ -898,9 +949,9 @@ d3.chart("hierarchy").extend("partition.arc", {
       },
 
       events: {
-        enter: function() {
+        "enter": function() {
           this.attr("d", chart.d3.arc)
-            .style("fill", function(d) { return chart.d3.color((d.children ? d : d.parent)[chart._name]); });
+            .style("fill", function(d) { return chart.d3.colorScale((d.children ? d : d.parent)[chart._name]); });
 
           this.on("click", function(event) {
             chart.trigger("path:click", event);
@@ -913,8 +964,10 @@ d3.chart("hierarchy").extend("partition.arc", {
     chart.on("change:radius", function() {
       chart.layers.paths
         .attr("transform", "translate(" + chart.base.attr("width") / 2 + "," + chart.base.attr("height") / 2 + ")");
+
       chart.d3.y = d3.scale.sqrt().range([0, chart._diameter / 2]);
     });
+
   },
 
 
@@ -933,7 +986,7 @@ d3.chart("hierarchy").extend("partition.arc", {
       return this._diameter;
     }
 
-    this._diameter = _ - 10;  
+    this._diameter = _ - 10;
 
     this.trigger("change:radius");
     if( this.root ) {
@@ -998,17 +1051,20 @@ d3.chart("hierarchy").extend("partition.rectangle", {
       },
 
       insert: function() {
-        return this.append("g").classed("partition", true)
-          .attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; });
+        return this.append("g").classed("partition", true);
       },
 
       events: {
-        enter: function() {
+        "enter": function() {
+
+          chart._initNode(this);
+          
+          this.attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; });
+
           var kx = chart._width  / chart.root.dx,
               ky = chart._height / 1; 
 
           this.append("rect")
-            .attr("class", function(d) { return d.children ? "parent" : "child"; })
             .attr("width", chart.root.dy * kx)
             .attr("height", function(d) { return d.dx * ky; }); 
 
@@ -1080,22 +1136,6 @@ d3.chart("hierarchy").extend("partition.rectangle", {
 
 
 
-d3.chart("cluster-tree.cartesian").extend("tree.cartesian", {
-
-  initialize : function() {
-    this.d3.layout = d3.layout.tree();
-  },
-});
-
-
-d3.chart("cluster-tree.radial").extend("tree.radial", {
-
-  initialize : function() {
-    this.d3.layout = d3.layout.tree();
-  }
-});
-
-
 d3.chart("hierarchy").extend("treemap", {
  
   initialize : function() {
@@ -1107,8 +1147,6 @@ d3.chart("hierarchy").extend("treemap", {
     chart._width  = chart.base.attr("width");
     chart._height = chart.base.attr("height");
 
-    var color = d3.scale.category20c();
-
     chart.layer("base", chart.layers.base, {
 
       dataBind: function(data) {
@@ -1116,23 +1154,23 @@ d3.chart("hierarchy").extend("treemap", {
       },
 
       insert: function() {
-        return this.append("g").classed("cell", true)
-          .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+        return this.append("g").classed("cell", true);
       },
 
       events: {
-        enter: function() {
+        "enter": function() {
 
+          this.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+          
           this.append("rect")
             .attr("width", function(d) { return d.dx; })
             .attr("height", function(d) { return d.dy; })
-            .attr("fill", function(d) { return d.parent ? color(d.parent[chart._name]) : null; });
+            .attr("fill", function(d) { return d.parent ? chart.d3.colorScale(d.parent[chart._name]) : null; });
 
           this.append("text")
             .attr("x", function(d) { return d.dx / 2; })
             .attr("y", function(d) { return d.dy / 2; })
             .attr("dy", ".35em")
-            .attr("text-anchor", "middle")
             .text(function(d) { return d.children ? null : d[chart._name]; }) // order is matter! getComputedTextLength
             .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; });
 

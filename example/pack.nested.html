@@ -17,23 +17,25 @@
         height: 500px;
         margin: auto; }
 
-      text {
+      .pack text {
         font: 12px sans-serif;
+        text-anchor: middle;
         pointer-events: none; }
 
-      .parent text {
-        fill: #1f77b4; }
-
-      circle {
+      .pack circle {
         fill: #ccc;
         stroke: #999; }
 
-      .parent circle {
+      .non-leaf text {
+        text-anchor: start;
+        fill: #1f77b4; }
+
+      .non-leaf circle {
         fill: #1f77b4;
         fill-opacity: 0.1;
         stroke: steelblue; }
 
-      .parent:hover circle {
+      .non-leaf:hover circle {
         stroke: #ff7f0e;
         stroke-width: 0.5px; }
     </style>
@@ -53,6 +55,7 @@
 
               //.diameter(200)
               .value("size")
+              .sort(function(a, b) { return -(a.value - b.value); })
               //.zoomable([1, 5])
               .collapsible()
               //.duration(200)

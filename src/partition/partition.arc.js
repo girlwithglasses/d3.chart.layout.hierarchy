@@ -12,11 +12,9 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
 
-
-    chart.d3.color = d3.scale.category20c();
-    chart.d3.x     = d3.scale.linear().range([0, 2 * Math.PI]);
-    chart.d3.y     = d3.scale.sqrt().range([0, chart._diameter / 2]);
-    chart.d3.arc   = d3.svg.arc()
+    chart.d3.x   = d3.scale.linear().range([0, 2 * Math.PI]);
+    chart.d3.y   = d3.scale.sqrt().range([0, chart._diameter / 2]);
+    chart.d3.arc = d3.svg.arc()
       .startAngle(function(d)  { return Math.max(0, Math.min(2 * Math.PI, chart.d3.x(d.x))); })
       .endAngle(function(d)    { return Math.max(0, Math.min(2 * Math.PI, chart.d3.x(d.x + d.dx))); })
       .innerRadius(function(d) { return Math.max(0, chart.d3.y(d.y)); })
@@ -39,9 +37,9 @@ d3.chart("hierarchy").extend("partition.arc", {
       },
 
       events: {
-        enter: function() {
+        "enter": function() {
           this.attr("d", chart.d3.arc)
-            .style("fill", function(d) { return chart.d3.color((d.children ? d : d.parent)[chart._name]); });
+            .style("fill", function(d) { return chart.d3.colorScale((d.children ? d : d.parent)[chart._name]); });
 
           this.on("click", function(event) {
             chart.trigger("path:click", event);
@@ -54,8 +52,10 @@ d3.chart("hierarchy").extend("partition.arc", {
     chart.on("change:radius", function() {
       chart.layers.paths
         .attr("transform", "translate(" + chart.base.attr("width") / 2 + "," + chart.base.attr("height") / 2 + ")");
+
       chart.d3.y = d3.scale.sqrt().range([0, chart._diameter / 2]);
     });
+
   },
 
 
@@ -74,7 +74,7 @@ d3.chart("hierarchy").extend("partition.arc", {
       return this._diameter;
     }
 
-    this._diameter = _ - 10;  
+    this._diameter = _ - 10;
 
     this.trigger("change:radius");
     if( this.root ) {

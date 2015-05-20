@@ -13,17 +13,22 @@
         width: 100%; }
 
       #vis {
-        width: 60%;
-        height: 500px;
+        width: 50%;
+        height: 700px;
         margin: auto; }
 
-      .node {
+      .node.non-leaf {
         cursor: pointer; }
 
       .node circle {
-        fill: #fff;
         stroke: steelblue;
         stroke-width: 1.5px; }
+
+      .node.leaf circle {
+        fill: #fff; }
+
+      .node.non-leaf circle {
+        fill: lightsteelblue; }
 
       .node text {
         font-size: 11px; }

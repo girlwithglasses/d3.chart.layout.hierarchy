@@ -18,7 +18,8 @@
         margin: auto; }
 
       .cell text {
-        font: 10px sans-serif; }
+        font: 10px sans-serif;
+        text-anchor: middle; }
 
       .cell rect {  
         stroke: #fff; }
@@ -42,6 +43,7 @@
               //.zoomable()
               .collapsible()
               //.duration()
+              //.colors(['#FF0000', '#00FF00', '#0000FF'])
               ;
 
           treemap.draw(json);

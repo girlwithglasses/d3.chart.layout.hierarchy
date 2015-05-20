@@ -17,8 +17,12 @@
         height: 700px;
         margin: auto; }
 
-      text {
+      .pack circle {
+        stroke: #AAA; }
+
+      .pack text {
         font: 12px sans-serif;
+        text-anchor: middle;
         pointer-events: none; }
     </style>
   </head>
@@ -47,18 +51,6 @@
         }
 
 
-        var format = d3.format(",d"),
-            color  = d3.scale.category20c();
-
-        function title(d) {
-          return d.packageName + ": " + format(d.value);
-        }
-
-        function fill(d) {
-          return color(d.packageName);
-        }
-
-
         d3.json("data/flare.json", function(error, json) {
 
           var pack = d3.select("#vis").append("svg")
@@ -66,12 +58,14 @@
             .chart("pack.flattened")
 
               //.diameter(200)
-              //.value("_count")
               .name("className")
-              .flatten(classes)
-              .formats({ title: title, fill: fill })
+              .bubble({
+                  flatten : classes,
+                  title   : function(d) { return d.packageName + ": " + d3.format(",d")(d.value); },
+                  pack    : function(d) { return d.packageName; }
+              })
               .zoomable([0.1, 4])
-              //.duration(200)
+              //.colors(['#FF0000', '#00FF00', '#0000FF'])
               ;
 
           pack.draw(json);

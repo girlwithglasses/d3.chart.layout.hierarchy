@@ -10,8 +10,6 @@ d3.chart("hierarchy").extend("treemap", {
     chart._width  = chart.base.attr("width");
     chart._height = chart.base.attr("height");
 
-    var color = d3.scale.category20c();
-
     chart.layer("base", chart.layers.base, {
 
       dataBind: function(data) {
@@ -19,23 +17,23 @@ d3.chart("hierarchy").extend("treemap", {
       },
 
       insert: function() {
-        return this.append("g").classed("cell", true)
-          .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+        return this.append("g").classed("cell", true);
       },
 
       events: {
-        enter: function() {
+        "enter": function() {
 
+          this.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+          
           this.append("rect")
             .attr("width", function(d) { return d.dx; })
             .attr("height", function(d) { return d.dy; })
-            .attr("fill", function(d) { return d.parent ? color(d.parent[chart._name]) : null; });
+            .attr("fill", function(d) { return d.parent ? chart.d3.colorScale(d.parent[chart._name]) : null; });
 
           this.append("text")
             .attr("x", function(d) { return d.dx / 2; })
             .attr("y", function(d) { return d.dy / 2; })
             .attr("dy", ".35em")
-            .attr("text-anchor", "middle")
             .text(function(d) { return d.children ? null : d[chart._name]; }) // order is matter! getComputedTextLength
             .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; });
 
