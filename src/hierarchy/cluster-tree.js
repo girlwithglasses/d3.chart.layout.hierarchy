@@ -29,9 +29,11 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
       events: {
         "enter": function() {
+
+          chart._initNode(this);
+
           this.append("circle")
-            .attr("r", 0)
-            .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+            .attr("r", 0);
 
           this.append("text")
             .attr("dy", ".35em")
@@ -43,13 +45,14 @@ d3.chart("hierarchy").extend("cluster-tree", {
           });
         },
 
+        "merge": function() {
+          chart._initNode(this);
+        },
+
         "merge:transition": function() {
           this.select("circle")
-            .attr("r", chart._radius)
-            .style("stroke", function(d) { return d.path ? "brown" : "steelblue"; })
-            .style("fill", function(d) {
-                return d.path && ! d.parent.path ? "#E2A76F"
-                                                 : d._children ? "lightsteelblue" : "#fff"; });
+            .attr()
+            .attr("r", chart._radius);
 
           this.select("text")
             .style("fill-opacity", 1);
@@ -90,9 +93,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
         "merge:transition": function() {
           this.duration(chart._duration)
-            .attr("d", chart.d3.diagonal)
-            .attr("stroke", function(d) { return d.source.path && d.target.path ? "#dd7b7b" : "#ccc"; })
-            .style("stroke-width", function(d) { return d.path ? 1 : 1.5; });
+            .attr("d", chart.d3.diagonal);
         },
 
         "exit:transition": function() {
@@ -185,7 +186,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
       if( depth !== undefined ) {
 
-        chart.walker(
+        chart._walker(
 
           chart.root,
 
