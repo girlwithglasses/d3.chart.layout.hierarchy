@@ -70,12 +70,12 @@ module.exports = function(grunt) {
 
             "src/cluster/cluster.cartesian.js",
             "src/cluster/cluster.radial.js",
+            "src/tree/tree.cartesian.js",
+            "src/tree/tree.radial.js",
             "src/pack/pack.flattened.js",
             "src/pack/pack.nested.js",
             "src/partition/partition.arc.js",
             "src/partition/partition.rectangle.js",
-            "src/tree/tree.cartesian.js",
-            "src/tree/tree.radial.js",
             "src/treemap/treemap.js",
 
             "src/end.js"
