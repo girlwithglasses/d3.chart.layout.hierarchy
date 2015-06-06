@@ -222,8 +222,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
     chart.layer("nodes", chart.layers.nodes, {
 
-      dataBind: function(data) {
-        return this.selectAll(".node").data(data, function(d) { return d._id || (d._id = ++counter); });
+      dataBind: function(nodes) {
+        return this.selectAll(".node").data(nodes, function(d) { return d._id || (d._id = ++counter); });
       },
 
       insert: function() {
@@ -276,9 +276,9 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
 
     chart.layer("links", chart.layers.links, {
-      dataBind: function(data) {
-        return this.selectAll(".link")
-          .data(chart.d3.layout.links(data), function(d) { return d.target._id; });
+
+      dataBind: function(nodes) {
+        return this.selectAll(".link").data(chart.d3.layout.links(nodes), function(d) { return d.target._id; });
       },
 
       insert: function() {
@@ -320,7 +320,14 @@ d3.chart("hierarchy").extend("cluster-tree", {
     if( chart.features.levelGap && chart.features.levelGap !== "auto" ) {
       nodes.forEach(function (d) { d.y = d.depth * chart.features.levelGap; });
     }
-    
+
+    chart.on("transform:stash", function() {
+      nodes.forEach(function(d) {
+        d.x0 = d.x;
+        d.y0 = d.y;
+      });
+    });
+
     return nodes;
   },
 
@@ -386,7 +393,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
     var depth = _;
 
-    chart.once("collapse:init", function() {
+    chart.on("collapse:init", function() {
 
       if( depth !== undefined ) {
 
@@ -397,13 +404,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
           function(d) { if( d.depth == depth ) { collapse(d); }},
 
           function(d) {
-            if( d.children && d.children.length > 0 && d.depth < depth ) {
-              return d.children;
-            } else if( d._children && d._children.length > 0 && d.depth < depth ) {
-              return d._children;
-            } else {
-              return null;
-            }
+            return d.children && d.children.length > 0 ? d.children : null;
           }
         );
       }
@@ -414,7 +415,15 @@ d3.chart("hierarchy").extend("cluster-tree", {
     chart.on("node:click", function(d) {
       d = toggle(d);
       chart.trigger("transform:stash");
+
+      // Set _internalUpdate, so chart will know that certain actions shouldn't
+      // be performed during update.
+      // @see cluster-tree.cartesian.transform
+      // @see cluster-tree.radial.transform
+      chart._internalUpdate = true;
       chart.draw(d);
+      chart._internalUpdate = false;
+
     });
 
 
@@ -455,7 +464,6 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
     chart.d3.diagonal = d3.svg.diagonal().projection(function(d) { return [d.y, d.x]; });
 
-
     chart.layers.nodes.on("enter", function() {
       this
         .attr("transform", function(d) { return "translate(" + chart.source.y0 + "," + chart.source.x0 + ")"; });
@@ -491,28 +499,20 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
     chart.source = root;
 
-    if( ! chart.root ) {
+    if( ! chart._internalUpdate ) {
       chart.root    = root;
       chart.root.x0 = chart.features.height / 2;
       chart.root.y0 = 0;
 
       nodes = chart.d3.layout
         .size([chart.features.height, chart.features.width])
-        .nodes(chart.root); // workaround for getting correct chart.root to transform method in hierarchy.js
+        .nodes(chart.root)
+        .reverse();
 
       chart.trigger("collapse:init");
     }
 
-    nodes = chart.d3.layout.nodes(chart.root).reverse();
-
-    chart.on("transform:stash", function() {
-      nodes.forEach(function(d) {
-        d.x0 = d.x;
-        d.y0 = d.y;
-      });
-    });
-
-    return nodes;
+    return chart.d3.layout.nodes(chart.root).reverse();
   },
 
 
@@ -578,9 +578,10 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
   transform: function(root) {
     var chart = this,
         nodes;
+
     chart.source = root;
 
-    if( ! chart.root ) {
+    if( ! chart._internalUpdate ) {
       chart.root    = root;
       chart.root.x0 = 360;
       chart.root.y0 = 0;
@@ -593,22 +594,14 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
             } else {
               return (a.parent == b.parent ? 1 : 2) / a.depth;
             }
-        }) // workaround
-        .nodes(chart.root);
+        })
+        .nodes(chart.root)
+        .reverse();
 
       chart.trigger("collapse:init");
     }
 
-    nodes = chart.d3.layout.nodes(chart.root).reverse();
-
-    chart.on("transform:stash", function() {
-      nodes.forEach(function(d) {
-        d.x0 = d.x;
-        d.y0 = d.y;
-      });
-    });
-
-    return nodes;
+    return chart.d3.layout.nodes(chart.root).reverse();
   },
 
 
@@ -682,8 +675,8 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
     chart.layer("base", chart.layers.base, {
 
-      dataBind: function(data) {
-        return this.selectAll(".pack").data(data.filter(function(d) { return ! d.children; }));
+      dataBind: function(nodes) {
+        return this.selectAll(".pack").data(nodes.filter(function(d) { return ! d.children; }));
       },
 
       insert: function() {
@@ -797,8 +790,8 @@ d3.chart("hierarchy").extend("pack.nested", {
 
     chart.layer("base", chart.layers.base, {
 
-      dataBind: function(data) {
-        return this.selectAll(".pack").data(data);
+      dataBind: function(nodes) {
+        return this.selectAll(".pack").data(nodes);
       },
 
       insert: function() {
@@ -936,8 +929,8 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.layer("base", chart.layers.base, {
 
-      dataBind: function(data) {
-        return this.selectAll("path").data(data);
+      dataBind: function(nodes) {
+        return this.selectAll("path").data(nodes);
       },
 
       insert: function() {
@@ -1038,8 +1031,8 @@ d3.chart("hierarchy").extend("partition.rectangle", {
 
     chart.layer("base", chart.layers.base, {
 
-      dataBind: function(data) {
-        return this.selectAll(".partition").data(data);
+      dataBind: function(nodes) {
+        return this.selectAll(".partition").data(nodes);
       },
 
       insert: function() {
@@ -1138,8 +1131,8 @@ d3.chart("hierarchy").extend("treemap", {
 
     chart.layer("base", chart.layers.base, {
 
-      dataBind: function(data) {
-        return this.selectAll(".cell").data(data);
+      dataBind: function(nodes) {
+        return this.selectAll(".cell").data(nodes);
       },
 
       insert: function() {
