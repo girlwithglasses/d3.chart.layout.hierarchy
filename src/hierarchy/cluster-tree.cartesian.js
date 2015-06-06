@@ -9,7 +9,6 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
     chart.d3.diagonal = d3.svg.diagonal().projection(function(d) { return [d.y, d.x]; });
 
-
     chart.layers.nodes.on("enter", function() {
       this
         .attr("transform", function(d) { return "translate(" + chart.source.y0 + "," + chart.source.x0 + ")"; });
@@ -45,28 +44,20 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
     chart.source = root;
 
-    if( ! chart.root ) {
+    if( ! chart._internalUpdate ) {
       chart.root    = root;
       chart.root.x0 = chart.features.height / 2;
       chart.root.y0 = 0;
 
       nodes = chart.d3.layout
         .size([chart.features.height, chart.features.width])
-        .nodes(chart.root); // workaround for getting correct chart.root to transform method in hierarchy.js
+        .nodes(chart.root)
+        .reverse();
 
       chart.trigger("collapse:init");
     }
 
-    nodes = chart.d3.layout.nodes(chart.root).reverse();
-
-    chart.on("transform:stash", function() {
-      nodes.forEach(function(d) {
-        d.x0 = d.x;
-        d.y0 = d.y;
-      });
-    });
-
-    return nodes;
+    return chart.d3.layout.nodes(chart.root).reverse();
   },
 
 

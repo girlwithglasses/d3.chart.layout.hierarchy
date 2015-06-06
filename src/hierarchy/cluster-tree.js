@@ -16,8 +16,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
     chart.layer("nodes", chart.layers.nodes, {
 
-      dataBind: function(data) {
-        return this.selectAll(".node").data(data, function(d) { return d._id || (d._id = ++counter); });
+      dataBind: function(nodes) {
+        return this.selectAll(".node").data(nodes, function(d) { return d._id || (d._id = ++counter); });
       },
 
       insert: function() {
@@ -70,9 +70,9 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
 
     chart.layer("links", chart.layers.links, {
-      dataBind: function(data) {
-        return this.selectAll(".link")
-          .data(chart.d3.layout.links(data), function(d) { return d.target._id; });
+
+      dataBind: function(nodes) {
+        return this.selectAll(".link").data(chart.d3.layout.links(nodes), function(d) { return d.target._id; });
       },
 
       insert: function() {
@@ -114,7 +114,14 @@ d3.chart("hierarchy").extend("cluster-tree", {
     if( chart.features.levelGap && chart.features.levelGap !== "auto" ) {
       nodes.forEach(function (d) { d.y = d.depth * chart.features.levelGap; });
     }
-    
+
+    chart.on("transform:stash", function() {
+      nodes.forEach(function(d) {
+        d.x0 = d.x;
+        d.y0 = d.y;
+      });
+    });
+
     return nodes;
   },
 
@@ -180,7 +187,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
     var depth = _;
 
-    chart.once("collapse:init", function() {
+    chart.on("collapse:init", function() {
 
       if( depth !== undefined ) {
 
@@ -191,13 +198,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
           function(d) { if( d.depth == depth ) { collapse(d); }},
 
           function(d) {
-            if( d.children && d.children.length > 0 && d.depth < depth ) {
-              return d.children;
-            } else if( d._children && d._children.length > 0 && d.depth < depth ) {
-              return d._children;
-            } else {
-              return null;
-            }
+            return d.children && d.children.length > 0 ? d.children : null;
           }
         );
       }
@@ -208,7 +209,15 @@ d3.chart("hierarchy").extend("cluster-tree", {
     chart.on("node:click", function(d) {
       d = toggle(d);
       chart.trigger("transform:stash");
+
+      // Set _internalUpdate, so chart will know that certain actions shouldn't
+      // be performed during update.
+      // @see cluster-tree.cartesian.transform
+      // @see cluster-tree.radial.transform
+      chart._internalUpdate = true;
       chart.draw(d);
+      chart._internalUpdate = false;
+
     });
 
 

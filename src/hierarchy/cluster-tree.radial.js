@@ -38,9 +38,10 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
   transform: function(root) {
     var chart = this,
         nodes;
+
     chart.source = root;
 
-    if( ! chart.root ) {
+    if( ! chart._internalUpdate ) {
       chart.root    = root;
       chart.root.x0 = 360;
       chart.root.y0 = 0;
@@ -53,22 +54,14 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
             } else {
               return (a.parent == b.parent ? 1 : 2) / a.depth;
             }
-        }) // workaround
-        .nodes(chart.root);
+        })
+        .nodes(chart.root)
+        .reverse();
 
       chart.trigger("collapse:init");
     }
 
-    nodes = chart.d3.layout.nodes(chart.root).reverse();
-
-    chart.on("transform:stash", function() {
-      nodes.forEach(function(d) {
-        d.x0 = d.x;
-        d.y0 = d.y;
-      });
-    });
-
-    return nodes;
+    return chart.d3.layout.nodes(chart.root).reverse();
   },
 
 
