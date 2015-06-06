@@ -7,11 +7,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
     var counter = 0;
 
-    chart.radius(chart._radius || 4.5);
-    chart.levelGap(chart._levelGap || "auto");
-
-    chart._width  = chart.base.attr("width");
-    chart._height = chart.base.attr("height");
+    chart.radius(chart.features.radius     || 4.5);
+    chart.levelGap(chart.features.levelGap || "auto");
 
     chart.layers.links = chart.layers.base.append("g").classed("links", true);
     chart.layers.nodes = chart.layers.base.append("g").classed("nodes", true);
@@ -37,7 +34,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
           this.append("text")
             .attr("dy", ".35em")
-            .text(function(d) { return d[chart._name]; })
+            .text(function(d) { return d[chart.features.name]; })
             .style("fill-opacity", 0);
 
           this.on("click", function(event) {
@@ -52,14 +49,14 @@ d3.chart("hierarchy").extend("cluster-tree", {
         "merge:transition": function() {
           this.select("circle")
             .attr()
-            .attr("r", chart._radius);
+            .attr("r", chart.features.radius);
 
           this.select("text")
             .style("fill-opacity", 1);
         },
 
         "exit:transition": function() {
-          this.duration(chart._duration)
+          this.duration(chart.features.duration)
             .remove();
 
           this.select("circle")
@@ -92,12 +89,12 @@ d3.chart("hierarchy").extend("cluster-tree", {
         },
 
         "merge:transition": function() {
-          this.duration(chart._duration)
+          this.duration(chart.features.duration)
             .attr("d", chart.d3.diagonal);
         },
 
         "exit:transition": function() {
-          this.duration(chart._duration)
+          this.duration(chart.features.duration)
             .attr("d", function(d) {
               var o = { x: chart.source.x, y: chart.source.y };
               return chart.d3.diagonal({ source: o, target: o });
@@ -114,8 +111,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
     var chart = this;
 
     // Adjust gap between node levels.
-    if( chart._levelGap && chart._levelGap !== "auto" ) {
-      nodes.forEach(function (d) { d.y = d.depth * chart._levelGap; });
+    if( chart.features.levelGap && chart.features.levelGap !== "auto" ) {
+      nodes.forEach(function (d) { d.y = d.depth * chart.features.levelGap; });
     }
     
     return nodes;
@@ -125,11 +122,11 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
   radius: function(_) {
     if( ! arguments.length ) {
-      return this._radius;
+      return this.features.radius;
     }
 
     if( _ === "_COUNT" ) {
-      this._radius = function(d) {
+      this.features.radius = function(d) {
         if( d._children ) {
           return d._children.length;
         } else if( d.children ) {
@@ -139,7 +136,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
       };
 
     } else {
-      this._radius = _;
+      this.features.radius = _;
     }
 
     this.trigger("change:radius");
@@ -163,10 +160,10 @@ d3.chart("hierarchy").extend("cluster-tree", {
    */
   levelGap: function(_) {
     if( ! arguments.length ) {
-      return this._levelGap;
+      return this.features.levelGap;
     }
 
-    this._levelGap = _;
+    this.features.levelGap = _;
     this.trigger("change:levelGap");
 
     if( this.root ) {
@@ -178,6 +175,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
 
   collapsible: function(_) {
+
     var chart = this;
 
     var depth = _;

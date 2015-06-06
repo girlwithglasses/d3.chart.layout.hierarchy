@@ -16,31 +16,36 @@ d3.chart("hierarchy", {
   initialize: function() {
     var chart = this;
 
-    chart.d3     = {};
-    chart.layers = {};
+
+    chart.features = {};
+    chart.d3       = {};
+    chart.layers   = {};
 
 
     chart.base.attr("width",  chart.base.node().parentElement.clientWidth);
     chart.base.attr("height", chart.base.node().parentElement.clientHeight);
 
-    chart.d3.colorScale = chart._colors ? d3.scale.ordinal().range(chart._colors) : d3.scale.category20c();
+    chart.features.width  = chart.base.attr("width");
+    chart.features.height = chart.base.attr("height");
+
+    chart.d3.colorScale = chart.features.colors ? d3.scale.ordinal().range(chart.features.colors) : d3.scale.category20c();
 
     chart.d3.zoom = d3.behavior.zoom();
     chart.layers.base = chart.base.append("g");
     
-    chart.name(chart._name         || "name");
-    chart.value(chart._value       || "value");
-    chart.duration(chart._duration || 750);
+    chart.name(chart.features.name         || "name");
+    chart.value(chart.features.value       || "value");
+    chart.duration(chart.features.duration || 750);
 
 
 
     chart.on("change:value", function() {
-      chart.d3.layout.value(function(d) { return chart._value === "_COUNT" ? 1 : d[chart._value]; });
+      chart.d3.layout.value(function(d) { return chart.features.value === "_COUNT" ? 1 : d[chart.features.value]; });
     });
 
 
     chart.on("change:colors", function() {
-      chart.d3.colorScale = d3.scale.ordinal().range(chart._colors);
+      chart.d3.colorScale = d3.scale.ordinal().range(chart.features.colors);
     });
 
 
@@ -67,11 +72,13 @@ d3.chart("hierarchy", {
      * @param node SVG element that represents node.
      * @private
      */
-    chart._initNode= function(node) {
+    chart._initNode = function(node) {
       node
-        .classed("leaf", function(d) { return d.isLeaf; })
+        .classed("leaf",     function(d) { return d.isLeaf; })
         .classed("non-leaf", function(d) { return ! d.isLeaf; });
     };
+
+
   },
 
 
@@ -101,10 +108,10 @@ d3.chart("hierarchy", {
 
   name: function(_) {
     if( ! arguments.length ) {
-      return this._name;
+      return this.features.name;
     }
 
-    this._name = _;
+    this.features.name = _;
 
     this.trigger("change:name");
     if( this.root ) {
@@ -117,10 +124,10 @@ d3.chart("hierarchy", {
 
   value: function(_) {
     if( ! arguments.length ) {
-      return this._value;
+      return this.features.value;
     }
 
-    this._value = _;
+    this.features.value = _;
 
     this.trigger("change:value");
     if( this.root ) {
@@ -133,10 +140,10 @@ d3.chart("hierarchy", {
 
   colors: function(_) {
     if( ! arguments.length ) {
-      return this._colors;
+      return this.features.colors;
     }
 
-    this._colors = _;
+    this.features.colors = _;
 
     this.trigger("change:colors");
     if( this.root ) {
@@ -149,10 +156,10 @@ d3.chart("hierarchy", {
 
   duration: function(_) {
     if( ! arguments.length ) {
-      return this._duration;
+      return this.features.duration;
     }
 
-    this._duration = _;
+    this.features.duration = _;
 
     this.trigger("change:duration");
     if( this.root ) {
@@ -160,6 +167,21 @@ d3.chart("hierarchy", {
     }
 
     return this;
+  },
+
+
+  sortable: function(_) {
+    var chart = this;
+
+    if( _ === "_ASC" ) {
+      chart.d3.layout.sort(function(a, b) { return d3.ascending(a[chart.features.name], b[chart.features.name] ); });
+    } else if( _ === "_DESC" ) {
+      chart.d3.layout.sort(function(a, b) { return d3.descending(a[chart.features.name], b[chart.features.name] ); });
+    } else {
+      chart.d3.layout.sort(_);
+    }
+
+    return chart;
   },
 
 
@@ -178,20 +200,6 @@ d3.chart("hierarchy", {
     return chart;
   },
 
-
-  sort: function(_) {
-    var chart = this;
-
-    if( _ === "_ASC" ) {
-      chart.d3.layout.sort(function(a, b) { return d3.ascending(a[chart._name], b[chart._name] ); });
-    } else if( _ === "_DESC" ) {
-      chart.d3.layout.sort(function(a, b) { return d3.descending(a[chart._name], b[chart._name] ); });
-    } else {
-      chart.d3.layout.sort(_);
-    }
-
-    return chart;
-  },
 });
 
 
@@ -205,11 +213,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
     var counter = 0;
 
-    chart.radius(chart._radius || 4.5);
-    chart.levelGap(chart._levelGap || "auto");
-
-    chart._width  = chart.base.attr("width");
-    chart._height = chart.base.attr("height");
+    chart.radius(chart.features.radius     || 4.5);
+    chart.levelGap(chart.features.levelGap || "auto");
 
     chart.layers.links = chart.layers.base.append("g").classed("links", true);
     chart.layers.nodes = chart.layers.base.append("g").classed("nodes", true);
@@ -235,7 +240,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
           this.append("text")
             .attr("dy", ".35em")
-            .text(function(d) { return d[chart._name]; })
+            .text(function(d) { return d[chart.features.name]; })
             .style("fill-opacity", 0);
 
           this.on("click", function(event) {
@@ -250,14 +255,14 @@ d3.chart("hierarchy").extend("cluster-tree", {
         "merge:transition": function() {
           this.select("circle")
             .attr()
-            .attr("r", chart._radius);
+            .attr("r", chart.features.radius);
 
           this.select("text")
             .style("fill-opacity", 1);
         },
 
         "exit:transition": function() {
-          this.duration(chart._duration)
+          this.duration(chart.features.duration)
             .remove();
 
           this.select("circle")
@@ -290,12 +295,12 @@ d3.chart("hierarchy").extend("cluster-tree", {
         },
 
         "merge:transition": function() {
-          this.duration(chart._duration)
+          this.duration(chart.features.duration)
             .attr("d", chart.d3.diagonal);
         },
 
         "exit:transition": function() {
-          this.duration(chart._duration)
+          this.duration(chart.features.duration)
             .attr("d", function(d) {
               var o = { x: chart.source.x, y: chart.source.y };
               return chart.d3.diagonal({ source: o, target: o });
@@ -312,8 +317,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
     var chart = this;
 
     // Adjust gap between node levels.
-    if( chart._levelGap && chart._levelGap !== "auto" ) {
-      nodes.forEach(function (d) { d.y = d.depth * chart._levelGap; });
+    if( chart.features.levelGap && chart.features.levelGap !== "auto" ) {
+      nodes.forEach(function (d) { d.y = d.depth * chart.features.levelGap; });
     }
     
     return nodes;
@@ -323,11 +328,11 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
   radius: function(_) {
     if( ! arguments.length ) {
-      return this._radius;
+      return this.features.radius;
     }
 
     if( _ === "_COUNT" ) {
-      this._radius = function(d) {
+      this.features.radius = function(d) {
         if( d._children ) {
           return d._children.length;
         } else if( d.children ) {
@@ -337,7 +342,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
       };
 
     } else {
-      this._radius = _;
+      this.features.radius = _;
     }
 
     this.trigger("change:radius");
@@ -361,10 +366,10 @@ d3.chart("hierarchy").extend("cluster-tree", {
    */
   levelGap: function(_) {
     if( ! arguments.length ) {
-      return this._levelGap;
+      return this.features.levelGap;
     }
 
-    this._levelGap = _;
+    this.features.levelGap = _;
     this.trigger("change:levelGap");
 
     if( this.root ) {
@@ -376,6 +381,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
 
   collapsible: function(_) {
+
     var chart = this;
 
     var depth = _;
@@ -445,7 +451,7 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
     var chart = this;
 
-    chart.margin(chart._margin || {});
+    chart.margin(chart.features.margin || {});
 
     chart.d3.diagonal = d3.svg.diagonal().projection(function(d) { return [d.y, d.x]; });
 
@@ -460,7 +466,7 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
     });
 
     chart.layers.nodes.on("merge:transition", function() {
-      this.duration(chart._duration)
+      this.duration(chart.features.duration)
         .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
     });
 
@@ -471,9 +477,9 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
 
     chart.on("change:margin", function() {
-      chart._width  = chart.base.attr("width")  - chart._margin.left - chart._margin.right;
-      chart._height = chart.base.attr("height") - chart._margin.top  - chart._margin.bottom;
-      chart.base.attr("transform", "translate(" + chart._margin.left + "," + chart._margin.top + ")");
+      chart.features.width  = chart.base.attr("width")  - chart.features.margin.left - chart.features.margin.right;
+      chart.features.height = chart.base.attr("height") - chart.features.margin.top  - chart.features.margin.bottom;
+      chart.base.attr("transform", "translate(" + chart.features.margin.left + "," + chart.features.margin.top + ")");
     });
   },
 
@@ -487,11 +493,11 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
     if( ! chart.root ) {
       chart.root    = root;
-      chart.root.x0 = chart._height / 2;
+      chart.root.x0 = chart.features.height / 2;
       chart.root.y0 = 0;
 
       nodes = chart.d3.layout
-        .size([chart._height, chart._width])
+        .size([chart.features.height, chart.features.width])
         .nodes(chart.root); // workaround for getting correct chart.root to transform method in hierarchy.js
 
       chart.trigger("collapse:init");
@@ -512,14 +518,14 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
   margin: function(_) {
     if( ! arguments.length ) {
-      return this._margin;
+      return this.features.margin;
     }
 
     ["top", "right", "bottom", "left"].forEach(function(dimension) {
       if( dimension in _ ) {
         this[dimension] = _[dimension];
       }
-    }, this._margin = { top: 0, right: 0, bottom: 0, left: 0 });
+    }, this.features.margin = { top: 0, right: 0, bottom: 0, left: 0 });
 
     this.trigger("change:margin");
     if( this.root ) {
@@ -539,13 +545,13 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
 
     var chart = this;
 
-    chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
+    chart.diameter(chart.features.diameter || Math.min(chart.features.width, chart.features.height));
 
     chart.d3.diagonal = d3.svg.diagonal.radial().projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
-    chart.d3.zoom.translate([chart._diameter / 2, chart._diameter / 2]);
+    chart.d3.zoom.translate([chart.features.diameter / 2, chart.features.diameter / 2]);
 
     chart.layers.base
-      .attr("transform", "translate(" + chart._diameter / 2 + "," + chart._diameter / 2 + ")");
+      .attr("transform", "translate(" + chart.features.diameter / 2 + "," + chart.features.diameter / 2 + ")");
 
 
     chart.layers.nodes.on("enter", function() {
@@ -558,7 +564,7 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
     });
 
     chart.layers.nodes.on("merge:transition", function() {
-      this.duration(chart._duration)
+      this.duration(chart.features.duration)
         .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
     });
 
@@ -580,7 +586,7 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
       chart.root.y0 = 0;
 
       nodes = chart.d3.layout
-        .size([360, chart._diameter / 4])
+        .size([360, chart.features.diameter / 4])
         .separation(function(a, b) {
             if( a.depth === 0 ) {
                return 1;
@@ -608,10 +614,10 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
 
   diameter: function(_) {
     if( ! arguments.length ) {
-      return this._diameter;
+      return this.features.diameter;
     }
 
-    this._diameter = _;
+    this.features.diameter = _;
     
     this.trigger("change:diameter");
     if( this.root ) {
@@ -665,16 +671,13 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
     chart.d3.layout = d3.layout.pack();
    
-    chart._width  = chart.base.attr("width");
-    chart._height = chart.base.attr("height");
+    chart.bubble(chart.features.bubble     || {});
+    chart.diameter(chart.features.diameter || Math.min(chart.features.width, chart.features.height));
 
-    chart.bubble(chart._bubble     || {});
-    chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
-
-    chart.d3.zoom.translate([(chart._width - chart._diameter) / 2, (chart._height - chart._diameter) / 2]);
+    chart.d3.zoom.translate([(chart.features.width - chart.features.diameter) / 2, (chart.features.height - chart.features.diameter) / 2]);
 
     chart.layers.base
-      .attr("transform", "translate(" + (chart._width - chart._diameter) / 2 + "," + (chart._height - chart._diameter) / 2 + ")");
+      .attr("transform", "translate(" + (chart.features.width - chart.features.diameter) / 2 + "," + (chart.features.height - chart.features.diameter) / 2 + ")");
 
 
     chart.layer("base", chart.layers.base, {
@@ -694,14 +697,14 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
           this.append("circle")
             .attr("r", function(d) { return d.r; })
-            .style("fill", function(d) { return chart.d3.colorScale(chart._bubble.pack(d)); });
+            .style("fill", function(d) { return chart.d3.colorScale(chart.features.bubble.pack(d)); });
 
           this.append("text")
             .attr("dy", ".3em")
-            .text(function(d) { return d[chart._name].substring(0, d.r / 3); });
+            .text(function(d) { return d[chart.features.name].substring(0, d.r / 3); });
 
           this.append("title")
-            .text(chart._bubble.title);
+            .text(chart.features.bubble.title);
 
           this.on("click", function(event) {
             chart.trigger("pack:click", event);
@@ -712,7 +715,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
     chart.on("change:diameter", function() {
       chart.layers.base
-        .attr("transform", "translate(" + (chart._width - chart._diameter) / 2 + "," + (chart._height - chart._diameter) / 2 + ")");
+        .attr("transform", "translate(" + (chart.features.width - chart.features.diameter) / 2 + "," + (chart.features.height - chart.features.diameter) / 2 + ")");
     });
   },
 
@@ -724,19 +727,18 @@ d3.chart("hierarchy").extend("pack.flattened", {
     chart.root = root;
 
     return chart.d3.layout
-      .size([chart._diameter, chart._diameter])
-      .sort(null)
+      .size([chart.features.diameter, chart.features.diameter])
       .padding(1.5)
-      .nodes(chart._bubble.flatten ? chart._bubble.flatten(root) : root);
+      .nodes(chart.features.bubble.flatten ? chart.features.bubble.flatten(root) : root);
   },
 
 
   diameter: function(_) {
     if( ! arguments.length ) {
-      return this._diameter;
+      return this.features.diameter;
     }
 
-    this._diameter = _ - 10;
+    this.features.diameter = _ - 10;
 
     this.trigger("change:diameter");
     if( this.root ) {
@@ -749,7 +751,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
   bubble: function(_) {
     if( ! arguments.length ) {
-      return this._bubble;
+      return this.features.bubble;
     }
 
     var chart = this;
@@ -758,10 +760,10 @@ d3.chart("hierarchy").extend("pack.flattened", {
       if( func in _ ) {
         this[func] = d3.functor(_[func]);
       }
-    }, this._bubble = {
+    }, this.features.bubble = {
        flatten : null,
-       title   : function(d) { return d[chart._value]; },
-       pack    : function(d) { return d[chart._name]; }
+       title   : function(d) { return d[chart.features.value]; },
+       pack    : function(d) { return d[chart.features.name]; }
       }
     );
 
@@ -785,15 +787,12 @@ d3.chart("hierarchy").extend("pack.nested", {
     
     chart.d3.layout = d3.layout.pack();
 
-    chart._width  = chart.base.attr("width");
-    chart._height = chart.base.attr("height");
+    chart.diameter(chart.features.diameter || Math.min(chart.features.width, chart.features.height));
 
-    chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
-
-    chart.d3.zoom.translate([(chart._width - chart._diameter) / 2, (chart._height - chart._diameter) / 2]);
+    chart.d3.zoom.translate([(chart.features.width - chart.features.diameter) / 2, (chart.features.height - chart.features.diameter) / 2]);
 
     chart.layers.base
-      .attr("transform", "translate(" + (chart._width - chart._diameter) / 2 + "," + (chart._height - chart._diameter) / 2 + ")");
+      .attr("transform", "translate(" + (chart.features.width - chart.features.diameter) / 2 + "," + (chart.features.height - chart.features.diameter) / 2 + ")");
 
 
     chart.layer("base", chart.layers.base, {
@@ -829,7 +828,7 @@ d3.chart("hierarchy").extend("pack.nested", {
 
           this.select("text")
             .style("opacity", function(d) { return d.r > 20 ? 1 : 0; })
-            .text(function(d) { return d[chart._name]; });
+            .text(function(d) { return d[chart.features.name]; });
         },
       }
     });
@@ -837,7 +836,7 @@ d3.chart("hierarchy").extend("pack.nested", {
 
     chart.on("change:diameter", function() {
       chart.layers.base
-        .attr("transform", "translate(" + (chart._width - chart._diameter) / 2 + "," + (chart._height - chart._diameter) / 2 + ")");
+        .attr("transform", "translate(" + (chart.features.width - chart.features.diameter) / 2 + "," + (chart.features.height - chart.features.diameter) / 2 + ")");
     });
   },
 
@@ -848,17 +847,17 @@ d3.chart("hierarchy").extend("pack.nested", {
     chart.root = root;
 
     return chart.d3.layout
-      .size([chart._diameter, chart._diameter])
+      .size([chart.features.diameter, chart.features.diameter])
       .nodes(root);
   },
 
 
   diameter: function(_) {
     if( ! arguments.length ) {
-      return this._diameter;
+      return this.features.diameter;
     }
 
-    this._diameter = _ - 10;
+    this.features.diameter = _ - 10;
 
     this.trigger("change:diameter");
     if( this.root ) {
@@ -873,8 +872,8 @@ d3.chart("hierarchy").extend("pack.nested", {
     var chart = this;
 
     var pack,
-        x = d3.scale.linear().range([0, chart._diameter]),
-        y = d3.scale.linear().range([0, chart._diameter]);
+        x = d3.scale.linear().range([0, chart.features.diameter]),
+        y = d3.scale.linear().range([0, chart.features.diameter]);
 
 
     chart.layers.base.on("merge", function() {
@@ -884,13 +883,13 @@ d3.chart("hierarchy").extend("pack.nested", {
 
 
     function collapse(d) {
-      var k = chart._diameter / d.r / 2;
+      var k = chart.features.diameter / d.r / 2;
 
       x.domain([d.x - d.r, d.x + d.r]);
       y.domain([d.y - d.r, d.y + d.r]);
 
       var t = chart.layers.base.transition()
-        .duration(chart._duration);
+        .duration(chart.features.duration);
 
       t.selectAll(".pack")
         .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
@@ -919,23 +918,20 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.d3.layout = d3.layout.partition();
 
-    chart._width  = chart.base.attr("width");
-    chart._height = chart.base.attr("height");
-
-    chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
+    chart.diameter(chart.features.diameter || Math.min(chart.features.width, chart.features.height));
 
     chart.d3.x   = d3.scale.linear().range([0, 2 * Math.PI]);
-    chart.d3.y   = d3.scale.sqrt().range([0, chart._diameter / 2]);
+    chart.d3.y   = d3.scale.sqrt().range([0, chart.features.diameter / 2]);
     chart.d3.arc = d3.svg.arc()
       .startAngle(function(d)  { return Math.max(0, Math.min(2 * Math.PI, chart.d3.x(d.x))); })
       .endAngle(function(d)    { return Math.max(0, Math.min(2 * Math.PI, chart.d3.x(d.x + d.dx))); })
       .innerRadius(function(d) { return Math.max(0, chart.d3.y(d.y)); })
       .outerRadius(function(d) { return Math.max(0, chart.d3.y(d.y + d.dy)); });
 
-    chart.d3.zoom.translate([chart.base.attr("width") / 2, chart.base.attr("height") / 2]);
+    chart.d3.zoom.translate([chart.features.width / 2, chart.features.height / 2]);
 
     chart.layers.base
-      .attr("transform", "translate(" + chart.base.attr("width") / 2 + "," + chart.base.attr("height") / 2 + ")");
+      .attr("transform", "translate(" + chart.features.width / 2 + "," + chart.features.height / 2 + ")");
 
 
     chart.layer("base", chart.layers.base, {
@@ -951,7 +947,7 @@ d3.chart("hierarchy").extend("partition.arc", {
       events: {
         "enter": function() {
           this.attr("d", chart.d3.arc)
-            .style("fill", function(d) { return chart.d3.colorScale((d.children ? d : d.parent)[chart._name]); });
+            .style("fill", function(d) { return chart.d3.colorScale((d.children ? d : d.parent)[chart.features.name]); });
 
           this.on("click", function(event) {
             chart.trigger("path:click", event);
@@ -963,9 +959,9 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.on("change:radius", function() {
       chart.layers.paths
-        .attr("transform", "translate(" + chart.base.attr("width") / 2 + "," + chart.base.attr("height") / 2 + ")");
+        .attr("transform", "translate(" + chart.features.width / 2 + "," + chart.features.height / 2 + ")");
 
-      chart.d3.y = d3.scale.sqrt().range([0, chart._diameter / 2]);
+      chart.d3.y = d3.scale.sqrt().range([0, chart.features.diameter / 2]);
     });
 
   },
@@ -983,10 +979,10 @@ d3.chart("hierarchy").extend("partition.arc", {
 
   diameter: function(_) {
     if( ! arguments.length ) {
-      return this._diameter;
+      return this.features.diameter;
     }
 
-    this._diameter = _ - 10;
+    this.features.diameter = _ - 10;
 
     this.trigger("change:radius");
     if( this.root ) {
@@ -1004,7 +1000,7 @@ d3.chart("hierarchy").extend("partition.arc", {
       var path = this;
       chart.on("path:click", function(d) {
           path.transition()
-            .duration(chart._duration)
+            .duration(chart.features.duration)
             .attrTween("d", arcTween(d));
         });
     });
@@ -1012,7 +1008,7 @@ d3.chart("hierarchy").extend("partition.arc", {
     function arcTween(d) {
       var xd = d3.interpolate(chart.d3.x.domain(), [d.x, d.x + d.dx]),
           yd = d3.interpolate(chart.d3.y.domain(), [d.y, 1]),
-          yr = d3.interpolate(chart.d3.y.range(),  [d.y ? 20 : 0, chart._diameter / 2]);
+          yr = d3.interpolate(chart.d3.y.range(),  [d.y ? 20 : 0, chart.features.diameter / 2]);
 
       return function(d, i) {
         return i ? function(t) { return chart.d3.arc(d); }
@@ -1034,12 +1030,8 @@ d3.chart("hierarchy").extend("partition.rectangle", {
     
     chart.d3.layout = d3.layout.partition();
 
-    chart._width  = chart.base.attr("width");
-    chart._height = chart.base.attr("height");
-
-   
-    var x = d3.scale.linear().range([0, chart._width]),
-        y = d3.scale.linear().range([0, chart._height]);
+    var x = d3.scale.linear().range([0, chart.features.width]),
+        y = d3.scale.linear().range([0, chart.features.height]);
 
     chart.d3.transform = function(d, ky) { return "translate(8," + d.dx * ky / 2 + ")"; };
 
@@ -1061,8 +1053,8 @@ d3.chart("hierarchy").extend("partition.rectangle", {
           
           this.attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; });
 
-          var kx = chart._width  / chart.root.dx,
-              ky = chart._height / 1; 
+          var kx = chart.features.width  / chart.root.dx,
+              ky = chart.features.height / 1; 
 
           this.append("rect")
             .attr("width", chart.root.dy * kx)
@@ -1072,7 +1064,7 @@ d3.chart("hierarchy").extend("partition.rectangle", {
             .attr("transform", function(d) { return chart.d3.transform(d, ky); })
             .attr("dy", ".35em")
             .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; })
-            .text(function(d) { return d[chart._name]; });
+            .text(function(d) { return d[chart.features.name]; });
 
           this.on("click", function(event) {
             chart.trigger("rect:click", event);
@@ -1098,7 +1090,7 @@ d3.chart("hierarchy").extend("partition.rectangle", {
 
     var node,
         x = d3.scale.linear(),
-        y = d3.scale.linear().range([0, chart._height]);
+        y = d3.scale.linear().range([0, chart.features.height]);
 
     chart.layers.base.on("merge", function() {
       node = chart.root;
@@ -1106,14 +1098,14 @@ d3.chart("hierarchy").extend("partition.rectangle", {
     });
 
     function collapse(d) {
-      var kx = (d.y ? chart._width - 40 : chart._width) / (1 - d.y),
-          ky = chart._height / d.dx;
+      var kx = (d.y ? chart.features.width - 40 : chart.features.width) / (1 - d.y),
+          ky = chart.features.height / d.dx;
 
-      x.domain([d.y, 1]).range([d.y ? 40 : 0, chart._width]);
+      x.domain([d.y, 1]).range([d.y ? 40 : 0, chart.features.width]);
       y.domain([d.x, d.x + d.dx]);
 
       var t = chart.layers.base.transition()
-        .duration(chart._duration);
+        .duration(chart.features.duration);
 
       t.selectAll(".partition")
         .attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; });
@@ -1144,9 +1136,6 @@ d3.chart("hierarchy").extend("treemap", {
 
     chart.d3.layout = d3.layout.treemap();
 
-    chart._width  = chart.base.attr("width");
-    chart._height = chart.base.attr("height");
-
     chart.layer("base", chart.layers.base, {
 
       dataBind: function(data) {
@@ -1165,13 +1154,13 @@ d3.chart("hierarchy").extend("treemap", {
           this.append("rect")
             .attr("width", function(d) { return d.dx; })
             .attr("height", function(d) { return d.dy; })
-            .attr("fill", function(d) { return d.parent ? chart.d3.colorScale(d.parent[chart._name]) : null; });
+            .attr("fill", function(d) { return d.parent ? chart.d3.colorScale(d.parent[chart.features.name]) : null; });
 
           this.append("text")
             .attr("x", function(d) { return d.dx / 2; })
             .attr("y", function(d) { return d.dy / 2; })
             .attr("dy", ".35em")
-            .text(function(d) { return d.children ? null : d[chart._name]; }) // order is matter! getComputedTextLength
+            .text(function(d) { return d.children ? null : d[chart.features.name]; }) // order is matter! getComputedTextLength
             .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; });
 
           this.on("click", function(event) {
@@ -1190,7 +1179,7 @@ d3.chart("hierarchy").extend("treemap", {
 
     return chart.d3.layout
       .round(false)
-      .size([chart._width, chart._height])
+      .size([chart.features.width, chart.features.height])
       .sticky(true)
       .nodes(root);
   },
@@ -1200,8 +1189,8 @@ d3.chart("hierarchy").extend("treemap", {
     var chart = this;
 
     var node,
-        x = d3.scale.linear().range([0, chart._width]),
-        y = d3.scale.linear().range([0, chart._height]);
+        x = d3.scale.linear().range([0, chart.features.width]),
+        y = d3.scale.linear().range([0, chart.features.height]);
 
     chart.layers.base.on("merge", function() {
       node = chart.root;
@@ -1209,14 +1198,14 @@ d3.chart("hierarchy").extend("treemap", {
     });
 
     function collapse(d) {
-      var kx = chart._width  / d.dx,
-          ky = chart._height / d.dy;
+      var kx = chart.features.width  / d.dx,
+          ky = chart.features.height / d.dy;
 
       x.domain([d.x, d.x + d.dx]);
       y.domain([d.y, d.y + d.dy]);
 
       var t = chart.layers.base.transition()
-        .duration(chart._duration);
+        .duration(chart.features.duration);
 
       t.selectAll(".cell")
         .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
