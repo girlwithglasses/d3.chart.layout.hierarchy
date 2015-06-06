@@ -9,8 +9,8 @@ d3.chart("hierarchy").extend("treemap", {
 
     chart.layer("base", chart.layers.base, {
 
-      dataBind: function(data) {
-        return this.selectAll(".cell").data(data);
+      dataBind: function(nodes) {
+        return this.selectAll(".cell").data(nodes);
       },
 
       insert: function() {
