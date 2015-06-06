@@ -18,8 +18,8 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
     chart.layer("base", chart.layers.base, {
 
-      dataBind: function(data) {
-        return this.selectAll(".pack").data(data.filter(function(d) { return ! d.children; }));
+      dataBind: function(nodes) {
+        return this.selectAll(".pack").data(nodes.filter(function(d) { return ! d.children; }));
       },
 
       insert: function() {

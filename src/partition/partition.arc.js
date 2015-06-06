@@ -25,8 +25,8 @@ d3.chart("hierarchy").extend("partition.arc", {
 
     chart.layer("base", chart.layers.base, {
 
-      dataBind: function(data) {
-        return this.selectAll("path").data(data);
+      dataBind: function(nodes) {
+        return this.selectAll("path").data(nodes);
       },
 
       insert: function() {

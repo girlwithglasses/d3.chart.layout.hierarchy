@@ -16,8 +16,8 @@ d3.chart("hierarchy").extend("pack.nested", {
 
     chart.layer("base", chart.layers.base, {
 
-      dataBind: function(data) {
-        return this.selectAll(".pack").data(data);
+      dataBind: function(nodes) {
+        return this.selectAll(".pack").data(nodes);
       },
 
       insert: function() {

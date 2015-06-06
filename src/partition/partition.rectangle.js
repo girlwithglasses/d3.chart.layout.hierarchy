@@ -15,8 +15,8 @@ d3.chart("hierarchy").extend("partition.rectangle", {
 
     chart.layer("base", chart.layers.base, {
 
-      dataBind: function(data) {
-        return this.selectAll(".partition").data(data);
+      dataBind: function(nodes) {
+        return this.selectAll(".partition").data(nodes);
       },
 
       insert: function() {
