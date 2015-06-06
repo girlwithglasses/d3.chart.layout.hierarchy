@@ -6,15 +6,12 @@ d3.chart("hierarchy").extend("pack.nested", {
     
     chart.d3.layout = d3.layout.pack();
 
-    chart._width  = chart.base.attr("width");
-    chart._height = chart.base.attr("height");
+    chart.diameter(chart.features.diameter || Math.min(chart.features.width, chart.features.height));
 
-    chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
-
-    chart.d3.zoom.translate([(chart._width - chart._diameter) / 2, (chart._height - chart._diameter) / 2]);
+    chart.d3.zoom.translate([(chart.features.width - chart.features.diameter) / 2, (chart.features.height - chart.features.diameter) / 2]);
 
     chart.layers.base
-      .attr("transform", "translate(" + (chart._width - chart._diameter) / 2 + "," + (chart._height - chart._diameter) / 2 + ")");
+      .attr("transform", "translate(" + (chart.features.width - chart.features.diameter) / 2 + "," + (chart.features.height - chart.features.diameter) / 2 + ")");
 
 
     chart.layer("base", chart.layers.base, {
@@ -50,7 +47,7 @@ d3.chart("hierarchy").extend("pack.nested", {
 
           this.select("text")
             .style("opacity", function(d) { return d.r > 20 ? 1 : 0; })
-            .text(function(d) { return d[chart._name]; });
+            .text(function(d) { return d[chart.features.name]; });
         },
       }
     });
@@ -58,7 +55,7 @@ d3.chart("hierarchy").extend("pack.nested", {
 
     chart.on("change:diameter", function() {
       chart.layers.base
-        .attr("transform", "translate(" + (chart._width - chart._diameter) / 2 + "," + (chart._height - chart._diameter) / 2 + ")");
+        .attr("transform", "translate(" + (chart.features.width - chart.features.diameter) / 2 + "," + (chart.features.height - chart.features.diameter) / 2 + ")");
     });
   },
 
@@ -69,17 +66,17 @@ d3.chart("hierarchy").extend("pack.nested", {
     chart.root = root;
 
     return chart.d3.layout
-      .size([chart._diameter, chart._diameter])
+      .size([chart.features.diameter, chart.features.diameter])
       .nodes(root);
   },
 
 
   diameter: function(_) {
     if( ! arguments.length ) {
-      return this._diameter;
+      return this.features.diameter;
     }
 
-    this._diameter = _ - 10;
+    this.features.diameter = _ - 10;
 
     this.trigger("change:diameter");
     if( this.root ) {
@@ -94,8 +91,8 @@ d3.chart("hierarchy").extend("pack.nested", {
     var chart = this;
 
     var pack,
-        x = d3.scale.linear().range([0, chart._diameter]),
-        y = d3.scale.linear().range([0, chart._diameter]);
+        x = d3.scale.linear().range([0, chart.features.diameter]),
+        y = d3.scale.linear().range([0, chart.features.diameter]);
 
 
     chart.layers.base.on("merge", function() {
@@ -105,13 +102,13 @@ d3.chart("hierarchy").extend("pack.nested", {
 
 
     function collapse(d) {
-      var k = chart._diameter / d.r / 2;
+      var k = chart.features.diameter / d.r / 2;
 
       x.domain([d.x - d.r, d.x + d.r]);
       y.domain([d.y - d.r, d.y + d.r]);
 
       var t = chart.layers.base.transition()
-        .duration(chart._duration);
+        .duration(chart.features.duration);
 
       t.selectAll(".pack")
         .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });

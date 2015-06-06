@@ -5,13 +5,13 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
 
     var chart = this;
 
-    chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
+    chart.diameter(chart.features.diameter || Math.min(chart.features.width, chart.features.height));
 
     chart.d3.diagonal = d3.svg.diagonal.radial().projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
-    chart.d3.zoom.translate([chart._diameter / 2, chart._diameter / 2]);
+    chart.d3.zoom.translate([chart.features.diameter / 2, chart.features.diameter / 2]);
 
     chart.layers.base
-      .attr("transform", "translate(" + chart._diameter / 2 + "," + chart._diameter / 2 + ")");
+      .attr("transform", "translate(" + chart.features.diameter / 2 + "," + chart.features.diameter / 2 + ")");
 
 
     chart.layers.nodes.on("enter", function() {
@@ -24,7 +24,7 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
     });
 
     chart.layers.nodes.on("merge:transition", function() {
-      this.duration(chart._duration)
+      this.duration(chart.features.duration)
         .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
     });
 
@@ -46,7 +46,7 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
       chart.root.y0 = 0;
 
       nodes = chart.d3.layout
-        .size([360, chart._diameter / 4])
+        .size([360, chart.features.diameter / 4])
         .separation(function(a, b) {
             if( a.depth === 0 ) {
                return 1;
@@ -74,10 +74,10 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
 
   diameter: function(_) {
     if( ! arguments.length ) {
-      return this._diameter;
+      return this.features.diameter;
     }
 
-    this._diameter = _;
+    this.features.diameter = _;
     
     this.trigger("change:diameter");
     if( this.root ) {

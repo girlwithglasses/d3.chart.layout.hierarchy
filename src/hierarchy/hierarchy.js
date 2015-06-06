@@ -4,31 +4,36 @@ d3.chart("hierarchy", {
   initialize: function() {
     var chart = this;
 
-    chart.d3     = {};
-    chart.layers = {};
+
+    chart.features = {};
+    chart.d3       = {};
+    chart.layers   = {};
 
 
     chart.base.attr("width",  chart.base.node().parentElement.clientWidth);
     chart.base.attr("height", chart.base.node().parentElement.clientHeight);
 
-    chart.d3.colorScale = chart._colors ? d3.scale.ordinal().range(chart._colors) : d3.scale.category20c();
+    chart.features.width  = chart.base.attr("width");
+    chart.features.height = chart.base.attr("height");
+
+    chart.d3.colorScale = chart.features.colors ? d3.scale.ordinal().range(chart.features.colors) : d3.scale.category20c();
 
     chart.d3.zoom = d3.behavior.zoom();
     chart.layers.base = chart.base.append("g");
     
-    chart.name(chart._name         || "name");
-    chart.value(chart._value       || "value");
-    chart.duration(chart._duration || 750);
+    chart.name(chart.features.name         || "name");
+    chart.value(chart.features.value       || "value");
+    chart.duration(chart.features.duration || 750);
 
 
 
     chart.on("change:value", function() {
-      chart.d3.layout.value(function(d) { return chart._value === "_COUNT" ? 1 : d[chart._value]; });
+      chart.d3.layout.value(function(d) { return chart.features.value === "_COUNT" ? 1 : d[chart.features.value]; });
     });
 
 
     chart.on("change:colors", function() {
-      chart.d3.colorScale = d3.scale.ordinal().range(chart._colors);
+      chart.d3.colorScale = d3.scale.ordinal().range(chart.features.colors);
     });
 
 
@@ -55,11 +60,13 @@ d3.chart("hierarchy", {
      * @param node SVG element that represents node.
      * @private
      */
-    chart._initNode= function(node) {
+    chart._initNode = function(node) {
       node
-        .classed("leaf", function(d) { return d.isLeaf; })
+        .classed("leaf",     function(d) { return d.isLeaf; })
         .classed("non-leaf", function(d) { return ! d.isLeaf; });
     };
+
+
   },
 
 
@@ -89,10 +96,10 @@ d3.chart("hierarchy", {
 
   name: function(_) {
     if( ! arguments.length ) {
-      return this._name;
+      return this.features.name;
     }
 
-    this._name = _;
+    this.features.name = _;
 
     this.trigger("change:name");
     if( this.root ) {
@@ -105,10 +112,10 @@ d3.chart("hierarchy", {
 
   value: function(_) {
     if( ! arguments.length ) {
-      return this._value;
+      return this.features.value;
     }
 
-    this._value = _;
+    this.features.value = _;
 
     this.trigger("change:value");
     if( this.root ) {
@@ -121,10 +128,10 @@ d3.chart("hierarchy", {
 
   colors: function(_) {
     if( ! arguments.length ) {
-      return this._colors;
+      return this.features.colors;
     }
 
-    this._colors = _;
+    this.features.colors = _;
 
     this.trigger("change:colors");
     if( this.root ) {
@@ -137,10 +144,10 @@ d3.chart("hierarchy", {
 
   duration: function(_) {
     if( ! arguments.length ) {
-      return this._duration;
+      return this.features.duration;
     }
 
-    this._duration = _;
+    this.features.duration = _;
 
     this.trigger("change:duration");
     if( this.root ) {
@@ -148,6 +155,21 @@ d3.chart("hierarchy", {
     }
 
     return this;
+  },
+
+
+  sortable: function(_) {
+    var chart = this;
+
+    if( _ === "_ASC" ) {
+      chart.d3.layout.sort(function(a, b) { return d3.ascending(a[chart.features.name], b[chart.features.name] ); });
+    } else if( _ === "_DESC" ) {
+      chart.d3.layout.sort(function(a, b) { return d3.descending(a[chart.features.name], b[chart.features.name] ); });
+    } else {
+      chart.d3.layout.sort(_);
+    }
+
+    return chart;
   },
 
 
@@ -166,20 +188,6 @@ d3.chart("hierarchy", {
     return chart;
   },
 
-
-  sort: function(_) {
-    var chart = this;
-
-    if( _ === "_ASC" ) {
-      chart.d3.layout.sort(function(a, b) { return d3.ascending(a[chart._name], b[chart._name] ); });
-    } else if( _ === "_DESC" ) {
-      chart.d3.layout.sort(function(a, b) { return d3.descending(a[chart._name], b[chart._name] ); });
-    } else {
-      chart.d3.layout.sort(_);
-    }
-
-    return chart;
-  },
 });
 
 

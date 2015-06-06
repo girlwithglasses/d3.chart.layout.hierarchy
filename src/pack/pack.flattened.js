@@ -7,16 +7,13 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
     chart.d3.layout = d3.layout.pack();
    
-    chart._width  = chart.base.attr("width");
-    chart._height = chart.base.attr("height");
+    chart.bubble(chart.features.bubble     || {});
+    chart.diameter(chart.features.diameter || Math.min(chart.features.width, chart.features.height));
 
-    chart.bubble(chart._bubble     || {});
-    chart.diameter(chart._diameter || Math.min(chart._width, chart._height));
-
-    chart.d3.zoom.translate([(chart._width - chart._diameter) / 2, (chart._height - chart._diameter) / 2]);
+    chart.d3.zoom.translate([(chart.features.width - chart.features.diameter) / 2, (chart.features.height - chart.features.diameter) / 2]);
 
     chart.layers.base
-      .attr("transform", "translate(" + (chart._width - chart._diameter) / 2 + "," + (chart._height - chart._diameter) / 2 + ")");
+      .attr("transform", "translate(" + (chart.features.width - chart.features.diameter) / 2 + "," + (chart.features.height - chart.features.diameter) / 2 + ")");
 
 
     chart.layer("base", chart.layers.base, {
@@ -36,14 +33,14 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
           this.append("circle")
             .attr("r", function(d) { return d.r; })
-            .style("fill", function(d) { return chart.d3.colorScale(chart._bubble.pack(d)); });
+            .style("fill", function(d) { return chart.d3.colorScale(chart.features.bubble.pack(d)); });
 
           this.append("text")
             .attr("dy", ".3em")
-            .text(function(d) { return d[chart._name].substring(0, d.r / 3); });
+            .text(function(d) { return d[chart.features.name].substring(0, d.r / 3); });
 
           this.append("title")
-            .text(chart._bubble.title);
+            .text(chart.features.bubble.title);
 
           this.on("click", function(event) {
             chart.trigger("pack:click", event);
@@ -54,7 +51,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
     chart.on("change:diameter", function() {
       chart.layers.base
-        .attr("transform", "translate(" + (chart._width - chart._diameter) / 2 + "," + (chart._height - chart._diameter) / 2 + ")");
+        .attr("transform", "translate(" + (chart.features.width - chart.features.diameter) / 2 + "," + (chart.features.height - chart.features.diameter) / 2 + ")");
     });
   },
 
@@ -66,19 +63,18 @@ d3.chart("hierarchy").extend("pack.flattened", {
     chart.root = root;
 
     return chart.d3.layout
-      .size([chart._diameter, chart._diameter])
-      .sort(null)
+      .size([chart.features.diameter, chart.features.diameter])
       .padding(1.5)
-      .nodes(chart._bubble.flatten ? chart._bubble.flatten(root) : root);
+      .nodes(chart.features.bubble.flatten ? chart.features.bubble.flatten(root) : root);
   },
 
 
   diameter: function(_) {
     if( ! arguments.length ) {
-      return this._diameter;
+      return this.features.diameter;
     }
 
-    this._diameter = _ - 10;
+    this.features.diameter = _ - 10;
 
     this.trigger("change:diameter");
     if( this.root ) {
@@ -91,7 +87,7 @@ d3.chart("hierarchy").extend("pack.flattened", {
 
   bubble: function(_) {
     if( ! arguments.length ) {
-      return this._bubble;
+      return this.features.bubble;
     }
 
     var chart = this;
@@ -100,10 +96,10 @@ d3.chart("hierarchy").extend("pack.flattened", {
       if( func in _ ) {
         this[func] = d3.functor(_[func]);
       }
-    }, this._bubble = {
+    }, this.features.bubble = {
        flatten : null,
-       title   : function(d) { return d[chart._value]; },
-       pack    : function(d) { return d[chart._name]; }
+       title   : function(d) { return d[chart.features.value]; },
+       pack    : function(d) { return d[chart.features.name]; }
       }
     );
 
