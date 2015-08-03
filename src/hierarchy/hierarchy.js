@@ -10,8 +10,8 @@ d3.chart("hierarchy", {
     chart.layers   = {};
 
 
-    chart.base.attr("width",  chart.base.node().parentElement.clientWidth);
-    chart.base.attr("height", chart.base.node().parentElement.clientHeight);
+    chart.base.attr("width",  chart.base.node().parentNode.clientWidth);
+    chart.base.attr("height", chart.base.node().parentNode.clientHeight);
 
     chart.features.width  = chart.base.attr("width");
     chart.features.height = chart.base.attr("height");
