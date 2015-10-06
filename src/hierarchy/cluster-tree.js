@@ -2,13 +2,13 @@
 d3.chart("hierarchy").extend("cluster-tree", {
 
   initialize : function() {
-
     var chart = this;
 
     var counter = 0;
 
-    chart.radius(chart.features.radius     || 4.5);
-    chart.levelGap(chart.features.levelGap || "auto");
+    chart.radius(chart.options.radius     || 4.5);
+    chart.levelGap(chart.options.levelGap || "auto");
+
 
     chart.layers.links = chart.layers.base.append("g").classed("links", true);
     chart.layers.nodes = chart.layers.base.append("g").classed("nodes", true);
@@ -26,37 +26,41 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
       events: {
         "enter": function() {
-
-          chart._initNode(this);
+          this.classed( "leaf", function(d) { return d.isLeaf; });
 
           this.append("circle")
             .attr("r", 0);
 
           this.append("text")
             .attr("dy", ".35em")
-            .text(function(d) { return d[chart.features.name]; })
+            .text(function(d) { return d[chart.options.name]; })
             .style("fill-opacity", 0);
 
-          this.on("click", function(event) {
-            chart.trigger("node:click", event);
-          });
-        },
 
+          this.on("click", function(event) { chart.trigger("click:node", event); });
+        },
+/*
         "merge": function() {
-          chart._initNode(this);
-        },
+          // Set additional node classes as they may change during manipulations
+          // with data. For example, a node is added to another leaf node, so
+          // ex-leaf node should change its class from node-leaf to node-parent.
+          this.classed( "leaf", function(d) { return d.isLeaf; });
 
+          // Function .classed() is not available in transition events.
+          this.classed( "collapsible", function(d) { return d._children !== undefined; });
+        },
+*/
         "merge:transition": function() {
           this.select("circle")
             .attr()
-            .attr("r", chart.features.radius);
+            .attr("r", chart.options.radius);
 
           this.select("text")
             .style("fill-opacity", 1);
         },
 
         "exit:transition": function() {
-          this.duration(chart.features.duration)
+          this.duration(chart.options.duration)
             .remove();
 
           this.select("circle")
@@ -72,7 +76,8 @@ d3.chart("hierarchy").extend("cluster-tree", {
     chart.layer("links", chart.layers.links, {
 
       dataBind: function(nodes) {
-        return this.selectAll(".link").data(chart.d3.layout.links(nodes), function(d) { return d.target._id; });
+        return this.selectAll(".link")
+          .data(chart.d3.layout.links(nodes), function(d) { return d.target._id; });
       },
 
       insert: function() {
@@ -89,12 +94,12 @@ d3.chart("hierarchy").extend("cluster-tree", {
         },
 
         "merge:transition": function() {
-          this.duration(chart.features.duration)
+          this.duration(chart.options.duration)
             .attr("d", chart.d3.diagonal);
         },
 
         "exit:transition": function() {
-          this.duration(chart.features.duration)
+          this.duration(chart.options.duration)
             .attr("d", function(d) {
               var o = { x: chart.source.x, y: chart.source.y };
               return chart.d3.diagonal({ source: o, target: o });
@@ -103,6 +108,7 @@ d3.chart("hierarchy").extend("cluster-tree", {
         },
       },
     });
+
   },
 
 
@@ -110,12 +116,16 @@ d3.chart("hierarchy").extend("cluster-tree", {
   transform: function(nodes) {
     var chart = this;
 
+    if( ! chart._internalUpdate ) { chart.trigger("init:collapsible", nodes); }
+
+    nodes = chart.d3.layout.nodes(chart.root);
+
     // Adjust gap between node levels.
-    if( chart.features.levelGap && chart.features.levelGap !== "auto" ) {
-      nodes.forEach(function (d) { d.y = d.depth * chart.features.levelGap; });
+    if( chart.options.levelGap && chart.options.levelGap !== "auto" ) {
+      nodes.forEach(function(d) { d.y = d.depth * chart.options.levelGap; });
     }
 
-    chart.on("transform:stash", function() {
+    chart.off("transform:stash").on("transform:stash", function() {
       nodes.forEach(function(d) {
         d.x0 = d.x;
         d.y0 = d.y;
@@ -128,12 +138,12 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
 
   radius: function(_) {
-    if( ! arguments.length ) {
-      return this.features.radius;
-    }
+    var chart = this;
 
-    if( _ === "_COUNT" ) {
-      this.features.radius = function(d) {
+    if( ! arguments.length ) { return chart.options.radius; }
+
+    if( _ === "_COUNT_" ) {
+      chart.options.radius = function(d) {
         if( d._children ) {
           return d._children.length;
         } else if( d.children ) {
@@ -143,15 +153,13 @@ d3.chart("hierarchy").extend("cluster-tree", {
       };
 
     } else {
-      this.features.radius = _;
+      chart.options.radius = _;
     }
 
-    this.trigger("change:radius");
-    if( this.root ) {
-      this.draw(this.root);
-    }
+    chart.trigger("change:radius");
+    if( chart.root ) { chart.draw(chart.root); }
 
-    return this;
+    return chart;
   },
 
 
@@ -166,47 +174,36 @@ d3.chart("hierarchy").extend("cluster-tree", {
    * @returns {*}
    */
   levelGap: function(_) {
-    if( ! arguments.length ) {
-      return this.features.levelGap;
-    }
+    var chart = this;
 
-    this.features.levelGap = _;
-    this.trigger("change:levelGap");
+    if( ! arguments.length ) { return chart.options.levelGap; }
 
-    if( this.root ) {
-      this.draw(this.root);
-    }
+    chart.options.levelGap = _;
+    chart.trigger("change:levelGap");
 
-    return this;
+    if( chart.root ) { chart.draw(chart.root); }
+    return chart;
   },
 
 
   collapsible: function(_) {
-
     var chart = this;
 
     var depth = _;
 
-    chart.on("collapse:init", function() {
-
+    chart.off("init:collapsible").on("init:collapsible", function( nodes ) {
       if( depth !== undefined ) {
-
-        chart._walker(
-
-          chart.root,
-
-          function(d) { if( d.depth == depth ) { collapse(d); }},
-
-          function(d) {
-            return d.children && d.children.length > 0 ? d.children : null;
+        nodes.forEach(function(d) {
+          if( d.depth == depth ) {
+            collapse(d);
           }
-        );
+        });
       }
     });
 
 
 
-    chart.on("node:click", function(d) {
+    chart.off("click:node").on("click:node", function(d) {
       d = toggle(d);
       chart.trigger("transform:stash");
 
