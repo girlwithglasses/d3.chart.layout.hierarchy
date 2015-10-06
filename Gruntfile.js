@@ -8,7 +8,7 @@ module.exports = function(grunt) {
     meta: {
       pkg: grunt.file.readJSON("package.json"),
 
-      source: ["src/**/*.js", '!src/start.js', '!src/end.js'],
+      source: ["src/**/*.js"],
 
       banner: "/*!\n" +
               " * <%= meta.pkg.name %> - v<%= meta.pkg.version %>\n" +
@@ -60,7 +60,7 @@ module.exports = function(grunt) {
         files: {
           "d3.chart.layout.hierarchy.js":
           [
-            "src/start.js",
+            "src/start.frag",
 
             "src/hierarchy/hierarchy.js",
 
@@ -78,7 +78,7 @@ module.exports = function(grunt) {
             "src/partition/partition.rectangle.js",
             "src/treemap/treemap.js",
 
-            "src/end.js"
+            "src/end.frag"
           ]
         }
       }
