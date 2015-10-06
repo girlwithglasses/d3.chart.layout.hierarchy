@@ -2,16 +2,15 @@
 d3.chart("cluster-tree").extend("cluster-tree.radial", {
 
   initialize : function() {
-
     var chart = this;
 
-    chart.diameter(chart.features.diameter || Math.min(chart.features.width, chart.features.height));
+    chart.diameter(chart.options.diameter || Math.min(chart.options.width, chart.options.height));
 
     chart.d3.diagonal = d3.svg.diagonal.radial().projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
-    chart.d3.zoom.translate([chart.features.diameter / 2, chart.features.diameter / 2]);
+    chart.d3.zoom.translate([chart.options.diameter / 2, chart.options.diameter / 2]);
 
     chart.layers.base
-      .attr("transform", "translate(" + chart.features.diameter / 2 + "," + chart.features.diameter / 2 + ")");
+      .attr("transform", "translate(" + chart.options.diameter / 2 + "," + chart.options.diameter / 2 + ")");
 
 
     chart.layers.nodes.on("enter", function() {
@@ -24,7 +23,7 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
     });
 
     chart.layers.nodes.on("merge:transition", function() {
-      this.duration(chart.features.duration)
+      this.duration(chart.options.duration)
         .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
     });
 
@@ -36,8 +35,7 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
 
 
   transform: function(root) {
-    var chart = this,
-        nodes;
+    var chart = this;
 
     chart.source = root;
 
@@ -45,39 +43,32 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
       chart.root    = root;
       chart.root.x0 = 360;
       chart.root.y0 = 0;
-
-      nodes = chart.d3.layout
-        .size([360, chart.features.diameter / 4])
-        .separation(function(a, b) {
-            if( a.depth === 0 ) {
-               return 1;
-            } else {
-              return (a.parent == b.parent ? 1 : 2) / a.depth;
-            }
-        })
-        .nodes(chart.root)
-        .reverse();
-
-      chart.trigger("collapse:init");
     }
 
-    return chart.d3.layout.nodes(chart.root).reverse();
+    return chart.d3.layout
+      .size([360, chart.options.diameter / 4])
+      .separation(function(a, b) {
+        if( a.depth === 0 ) {
+          return 1;
+        } else {
+          return (a.parent == b.parent ? 1 : 2) / a.depth;
+        }
+      })
+      .nodes(chart.root);
   },
 
 
   diameter: function(_) {
-    if( ! arguments.length ) {
-      return this.features.diameter;
-    }
+    var chart = this;
 
-    this.features.diameter = _;
+    if( ! arguments.length ) { return chart.options.diameter; }
+
+    chart.options.diameter = _;
     
-    this.trigger("change:diameter");
-    if( this.root ) {
-      this.draw(this.root);
-    }
+    chart.trigger("change:diameter");
+    if( chart.root ) { chart.draw(chart.root); }
 
-    return this;
+    return chart;
   },
 });
 

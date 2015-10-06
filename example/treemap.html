@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Treemap Example</title>
     <script src="../bower_components/d3/d3.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
     <script src="../bower_components/d3.chart/d3.chart.js"></script>
     <script src="../d3.chart.layout.hierarchy.js"></script>
     <style>
@@ -18,6 +19,7 @@
         margin: auto; }
 
       .cell text {
+        cursor: move;
         font: 10px sans-serif;
         text-anchor: middle; }
 
@@ -32,23 +34,28 @@
     <script>
       (function() {
 
-        d3.json("data/flare.json", function(error, json) {
+        var treemap = d3.select("#vis").append("svg")
 
-          var treemap = d3.select("#vis").append("svg")
+          .chart("treemap")
 
-            .chart("treemap")
+            .value("size")
+            .sortable("_DESC_")
+            //.zoomable()
+            .collapsible()
+            //.duration()
+            //.colors(['#FF0000', '#00FF00', '#0000FF'])
+            ;
 
-              .value("size")
-              .sortable("_DESC")
-              //.zoomable()
-              .collapsible()
-              //.duration()
-              //.colors(['#FF0000', '#00FF00', '#0000FF'])
-              ;
+        queue()
+          .defer(d3.json, "data/mini.json")
+          .defer(d3.json, "data/flare.json")
+          .await(ready);
 
-          treemap.draw(json);
+        function ready(error, mini, flare) {
+          treemap.draw(mini);
+          treemap.draw(flare);
+        }
 
-        });
       }());
     </script>
   </body>

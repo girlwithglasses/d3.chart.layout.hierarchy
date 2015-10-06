@@ -18,26 +18,28 @@
         margin: auto; }
 
       .pack text {
+        fill: #1f77b4;
         font: 12px sans-serif;
-        text-anchor: middle;
-        pointer-events: none; }
+        text-anchor: start; }
 
       .pack circle {
-        fill: #ccc;
-        stroke: #999; }
-
-      .non-leaf text {
-        text-anchor: start;
-        fill: #1f77b4; }
-
-      .non-leaf circle {
         fill: #1f77b4;
         fill-opacity: 0.1;
         stroke: steelblue; }
 
-      .non-leaf:hover circle {
+      .pack:hover circle {
         stroke: #ff7f0e;
         stroke-width: 0.5px; }
+
+      .pack.leaf text {
+        fill: #333;
+        text-anchor: middle;
+        pointer-events: none; }
+
+      .pack.leaf circle {
+        fill: #ccc;
+        fill-opacity: 1;
+        stroke: #999; }
     </style>
   </head>
   <body>

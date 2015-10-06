@@ -4,67 +4,56 @@ d3.chart("hierarchy", {
   initialize: function() {
     var chart = this;
 
-
-    chart.features = {};
-    chart.d3       = {};
-    chart.layers   = {};
-
+    chart.options = {};
+    chart.d3      = {};
+    chart.layers  = {};
 
     chart.base.attr("width",  chart.base.node().parentNode.clientWidth);
     chart.base.attr("height", chart.base.node().parentNode.clientHeight);
 
-    chart.features.width  = chart.base.attr("width");
-    chart.features.height = chart.base.attr("height");
+    chart.options.width  = chart.base.attr("width");
+    chart.options.height = chart.base.attr("height");
 
-    chart.d3.colorScale = chart.features.colors ? d3.scale.ordinal().range(chart.features.colors) : d3.scale.category20c();
+    chart.d3.colorScale = chart.options.colors ? d3.scale.ordinal().range(chart.options.colors) : d3.scale.category20c();
+    chart.d3.zoom       = d3.behavior.zoom();
 
-    chart.d3.zoom = d3.behavior.zoom();
     chart.layers.base = chart.base.append("g");
     
-    chart.name(chart.features.name         || "name");
-    chart.value(chart.features.value       || "value");
-    chart.duration(chart.features.duration || 750);
+    chart.name(chart.options.name         || "name");
+    chart.value(chart.options.value       || "value");
+    chart.duration(chart.options.duration || 750);
 
 
+    chart._internalUpdate = false;
 
-    chart.on("change:value", function() {
-      chart.d3.layout.value(function(d) { return chart.features.value === "_COUNT" ? 1 : d[chart.features.value]; });
+
+    chart.off("change:value").on("change:value", function() {
+      chart.d3.layout.value(function(d) {
+        return chart.options.value === "_COUNT_" ? 1 : d[chart.options.value];
+      });
     });
 
 
-    chart.on("change:colors", function() {
-      chart.d3.colorScale = d3.scale.ordinal().range(chart.features.colors);
+    chart.off("change:colors").on("change:colors", function() {
+      chart.d3.colorScale = d3.scale.ordinal().range(chart.options.colors);
     });
 
 
-    // http://bl.ocks.org/robschmuecker/7926762
-    chart._walker = function(parent, walkerFunction, childrenFunction) {
-      if( ! parent ) {
-        return;
-      }
-
-      walkerFunction(parent);
-
-      var children = childrenFunction(parent);
-      if( children ) {
-        for( var count = children.length, i = 0; i < count; i++ ) {
-          chart._walker( children[i], walkerFunction, childrenFunction );
+    chart.off("init:leaves").on("init:leaves", function() {
+      chart._walker(
+        chart.root,
+        function(d) { d.isLeaf = ! d.children && ! d._children; },
+        function(d) {
+          if( d.children && d.children.length > 0 ) {
+            return d.children;
+          } else if( d._children && d._children.length > 0 ) {
+            return d._children;
+          } else {
+            return null;
+          }
         }
-      }
-    };
-
-
-    /**
-     * Initializes node attributes.
-     *
-     * @param node SVG element that represents node.
-     * @private
-     */
-    chart._initNode = function(node) {
-      node
-        .classed("leaf",     function(d) { return d.isLeaf; })
-        .classed("non-leaf", function(d) { return ! d.isLeaf; });
-    };
+      );
+    });
 
 
   },
@@ -72,102 +61,82 @@ d3.chart("hierarchy", {
 
 
   transform: function(nodes) {
-    // Before we proceed, mark leaf nodes on tree
-    this._walker(
+    var chart = this;
 
-      this.root,
-      
-      function(d) { d.isLeaf = ! d.children && ! d._children; },
-      
-      function(d) {
-        if( d.children && d.children.length > 0 ) {
-          return d.children;
-        } else if( d._children && d._children.length > 0 ) {
-          return d._children;
-        } else {
-          return null;
-        }
-      }
-    );
+    if( ! chart._internalUpdate ) { chart.trigger("init:leaves"); }
 
     return nodes;
   },
 
 
   name: function(_) {
-    if( ! arguments.length ) {
-      return this.features.name;
-    }
+    var chart = this;
 
-    this.features.name = _;
+    if( ! arguments.length ) { return chart.options.name; }
 
-    this.trigger("change:name");
-    if( this.root ) {
-      this.draw(this.root);
-    }
+    chart.options.name = _;
 
-    return this;
+    chart.trigger("change:name");
+    if( chart.root ) { chart.draw(chart.root); }
+
+    return chart;
   },
 
 
   value: function(_) {
-    if( ! arguments.length ) {
-      return this.features.value;
-    }
+    var chart = this;
 
-    this.features.value = _;
+    if( ! arguments.length ) { return chart.options.value; }
 
-    this.trigger("change:value");
-    if( this.root ) {
-      this.draw(this.root);
-    }
+    chart.options.value = _;
 
-    return this;
+    chart.trigger("change:value");
+    if( chart.root ) { chart.draw(chart.root); }
+
+    return chart;
   },
 
 
   colors: function(_) {
-    if( ! arguments.length ) {
-      return this.features.colors;
-    }
+    var chart = this;
 
-    this.features.colors = _;
+    if( ! arguments.length ) { return chart.options.colors; }
 
-    this.trigger("change:colors");
-    if( this.root ) {
-      this.draw(this.root);
-    }
+    chart.options.colors = _;
 
-    return this;    
+    chart.trigger("change:colors");
+    if( chart.root ) { chart.draw(chart.root); }
+
+    return chart;    
   },
 
 
   duration: function(_) {
-    if( ! arguments.length ) {
-      return this.features.duration;
-    }
+    var chart = this;
 
-    this.features.duration = _;
+    if( ! arguments.length ) { return chart.options.duration; }
 
-    this.trigger("change:duration");
-    if( this.root ) {
-      this.draw(this.root);
-    }
+    chart.options.duration = _;
 
-    return this;
+    chart.trigger("change:duration");
+    if( chart.root ) { chart.draw(chart.root); }
+
+    return chart;
   },
 
 
   sortable: function(_) {
     var chart = this;
 
-    if( _ === "_ASC" ) {
-      chart.d3.layout.sort(function(a, b) { return d3.ascending(a[chart.features.name], b[chart.features.name] ); });
-    } else if( _ === "_DESC" ) {
-      chart.d3.layout.sort(function(a, b) { return d3.descending(a[chart.features.name], b[chart.features.name] ); });
-    } else {
-      chart.d3.layout.sort(_);
-    }
+    if( _ === "_ASC_" ) {
+      chart.d3.layout.sort(function(a, b) {
+        return d3.ascending(a[chart.options.name], b[chart.options.name] );
+      });
+    } else if( _ === "_DESC_" ) {
+      chart.d3.layout.sort(function(a, b) {
+        return d3.descending(a[chart.options.name], b[chart.options.name] );
+      });
+    } else { chart.d3.layout.sort(_); }
 
     return chart;
   },
@@ -187,6 +156,22 @@ d3.chart("hierarchy", {
 
     return chart;
   },
+
+
+  // http://bl.ocks.org/robschmuecker/7926762
+  _walker: function(parent, walkerFunction, childrenFunction) {
+    if( ! parent ) { return; }
+
+    walkerFunction(parent);
+
+    var children = childrenFunction(parent);
+    if( children ) {
+      for( var count = children.length, i = 0; i < count; i++ ) {
+        this._walker( children[i], walkerFunction, childrenFunction );
+      }
+    }
+  },
+
 
 });
 
