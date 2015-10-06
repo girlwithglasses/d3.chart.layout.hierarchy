@@ -19,15 +19,15 @@
 
       .partition rect {
         cursor: pointer;
-        stroke: #eee;
-        fill: #aaa;
-        fill-opacity: .8; }
+        fill: steelblue;
+        stroke: #fff; }
 
-      .non-leaf rect {
-        fill: steelblue; }
-
-      text {
+      .partition text {
         pointer-events: none; } 
+
+      .partition.leaf rect {
+        stroke: #eee;
+        fill: #aaa; }
     </style>
   </head>
   <body>
@@ -44,10 +44,10 @@
             .chart("partition.rectangle")
 
               .value("size")
-              //.zoomable([1, 5])
+              //.zoomaable([1, 5])
               .collapsible()
               //.duration(200)
-              .sortable("_DESC")
+              .sortable("_DESC_")
               ;
 
           partition.draw(json);
