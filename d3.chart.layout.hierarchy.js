@@ -61,8 +61,14 @@ d3.chart("hierarchy", {
       chart.d3.colorScale = d3.scale.ordinal().range(chart.options.colors);
     });
 
+  },
 
-    chart.off("init:leaves").on("init:leaves", function() {
+
+
+  transform: function(nodes) {
+    var chart = this;
+
+    if( ! chart._internalUpdate ) {
       chart._walker(
         chart.root,
         function(d) { d.isLeaf = ! d.children && ! d._children; },
@@ -76,17 +82,7 @@ d3.chart("hierarchy", {
           }
         }
       );
-    });
-
-
-  },
-
-
-
-  transform: function(nodes) {
-    var chart = this;
-
-    if( ! chart._internalUpdate ) { chart.trigger("init:leaves"); }
+    }
 
     return nodes;
   },
@@ -159,7 +155,9 @@ d3.chart("hierarchy", {
       chart.d3.layout.sort(function(a, b) {
         return d3.descending(a[chart.options.name], b[chart.options.name] );
       });
-    } else { chart.d3.layout.sort(_); }
+    } else {
+      chart.d3.layout.sort(_);
+    }
 
     return chart;
   },
