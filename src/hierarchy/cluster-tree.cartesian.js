@@ -2,7 +2,6 @@
 d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
   initialize : function() {
-
     var chart = this;
 
     chart.margin(chart.options.margin || {});
