@@ -6,17 +6,16 @@
  * Library released under BSD-3-Clause license.
  */
 
-
 (function(global, factory) {
-	"use strict";
+  "use strict";
 
-	if (typeof global.define === "function" && global.define.amd) {
-		define(["d3"], function(d3) {
-			factory(global, d3);
-		});
-	} else {
-		factory(global, global.d3);
-	}
+  if( typeof global.define === "function" && global.define.amd ) {
+    define(["d3"], function(d3) {
+      factory(global, d3);
+    });
+  } else {
+    factory(global, global.d3);
+  }
 
 })(this, function(window, d3) {
 "use strict";
@@ -84,7 +83,7 @@ d3.chart("hierarchy", {
       );
     }
 
-    return nodes;
+    return nodes.reverse();
   },
 
 
@@ -448,7 +447,6 @@ d3.chart("hierarchy").extend("cluster-tree", {
 d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
   initialize : function() {
-
     var chart = this;
 
     chart.margin(chart.options.margin || {});
@@ -602,7 +600,6 @@ d3.chart("cluster-tree").extend("cluster-tree.radial", {
 
 
 d3.chart("cluster-tree.cartesian").extend("cluster.cartesian", {
-
   initialize : function() {
     this.d3.layout = d3.layout.cluster();
   },
@@ -610,7 +607,6 @@ d3.chart("cluster-tree.cartesian").extend("cluster.cartesian", {
 
 
 d3.chart("cluster-tree.radial").extend("cluster.radial", {
-
   initialize : function() {
     this.d3.layout = d3.layout.cluster();
   },
@@ -618,7 +614,6 @@ d3.chart("cluster-tree.radial").extend("cluster.radial", {
 
 
 d3.chart("cluster-tree.cartesian").extend("tree.cartesian", {
-
   initialize : function() {
     this.d3.layout = d3.layout.tree();
   },
@@ -626,7 +621,6 @@ d3.chart("cluster-tree.cartesian").extend("tree.cartesian", {
 
 
 d3.chart("cluster-tree.radial").extend("tree.radial", {
-
   initialize : function() {
     this.d3.layout = d3.layout.tree();
   }
