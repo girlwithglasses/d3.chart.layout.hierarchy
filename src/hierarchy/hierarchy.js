@@ -61,7 +61,7 @@ d3.chart("hierarchy", {
       );
     }
 
-    return nodes;
+    return nodes.reverse();
   },
 
 
