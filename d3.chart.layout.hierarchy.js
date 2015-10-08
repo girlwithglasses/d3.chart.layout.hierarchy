@@ -1,5 +1,5 @@
 /*!
- * d3.chart.layout.hierarchy - v0.3.6
+ * d3.chart.layout.hierarchy - v0.3.7
  * https://github.com/bansaghi/d3.chart.layout.hierarchy/
  * 
  * Copyright (c) 2015 Anna Bansaghi <anna.bansaghi@mamikon.net> (http://mamikon.net)
