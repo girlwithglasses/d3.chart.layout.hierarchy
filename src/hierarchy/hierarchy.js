@@ -4,9 +4,9 @@ d3.chart("hierarchy", {
   initialize: function() {
     var chart = this;
 
-    chart.options = {};
     chart.d3      = {};
     chart.layers  = {};
+    chart.options = {};
 
     chart.base.attr("width",  chart.base.node().parentNode.clientWidth);
     chart.base.attr("height", chart.base.node().parentNode.clientHeight);
@@ -61,7 +61,7 @@ d3.chart("hierarchy", {
       );
     }
 
-    return nodes.reverse();
+    return nodes;
   },
 
 
