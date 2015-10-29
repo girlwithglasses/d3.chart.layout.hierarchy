@@ -1,5 +1,5 @@
 /*!
- * d3.chart.layout.hierarchy - v0.3.7
+ * d3.chart.layout.hierarchy - v0.3.8
  * https://github.com/bansaghi/d3.chart.layout.hierarchy/
  * 
  * Copyright (c) 2015 Anna Bansaghi <anna.bansaghi@mamikon.net> (http://mamikon.net)
@@ -26,9 +26,9 @@ d3.chart("hierarchy", {
   initialize: function() {
     var chart = this;
 
-    chart.options = {};
     chart.d3      = {};
     chart.layers  = {};
+    chart.options = {};
 
     chart.base.attr("width",  chart.base.node().parentNode.clientWidth);
     chart.base.attr("height", chart.base.node().parentNode.clientHeight);
@@ -83,7 +83,7 @@ d3.chart("hierarchy", {
       );
     }
 
-    return nodes.reverse();
+    return nodes;
   },
 
 
