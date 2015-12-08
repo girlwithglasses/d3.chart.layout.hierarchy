@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <title>Radial Tree Example</title>
-    <script src="../bower_components/d3/d3.js"></script>
-    <script src="../bower_components/d3.chart/d3.chart.js"></script>
+    <script src="../node_modules/d3/d3.js"></script>
+    <script src="../node_modules/d3.chart/d3.chart.js"></script>
     <script src="../d3.chart.layout.hierarchy.js"></script>
     <style>
       html {
@@ -24,12 +24,17 @@
         cursor: default; }
 
       .node circle {
-        fill: lightsteelblue;
+        fill: #fff;
         stroke: steelblue;
         stroke-width: 1.5px; }
 
-      .node.leaf circle {
-        fill: #fff; }
+      .expandable circle {
+        fill: lightsteelblue;
+      }
+
+      .leaf circle {
+        stroke: deepskyblue;
+      }
 
       .node text {
         font-size: 11px; }

@@ -1,31 +1,44 @@
 
 d3.chart("hierarchy", {
 
-  initialize: function() {
+  initialize: function( options ) {
     var chart = this;
 
-    chart.d3      = {};
-    chart.layers  = {};
-    chart.options = {};
+    options = options || {};
 
-    chart.base.attr("width",  chart.base.node().parentNode.clientWidth);
-    chart.base.attr("height", chart.base.node().parentNode.clientHeight);
+    // set up defaults
+    chart.d3 = {
+        colorScale: options.colors
+          ? d3.scale.ordinal().range(options.colors)
+          : d3.scale.category20c()
 
-    chart.options.width  = chart.base.attr("width");
-    chart.options.height = chart.base.attr("height");
+        , zoom: d3.behavior.zoom()
+    };
 
-    chart.d3.colorScale = chart.options.colors ? d3.scale.ordinal().range(chart.options.colors) : d3.scale.category20c();
-    chart.d3.zoom       = d3.behavior.zoom();
+    chart.layers = {
+        base: chart.base.append('g')
+    };
 
-    chart.layers.base = chart.base.append("g");
-    
-    chart.name(chart.options.name         || "name");
-    chart.value(chart.options.value       || "value");
-    chart.duration(chart.options.duration || 750);
+    var dimensions = {
+      width: chart.base.node().parentNode.clientWidth,
+      height: chart.base.node().parentNode.clientHeight
+    };
 
+    chart.base.node().style.width = '100%';
+    chart.base.node().style.height ='100%';
+
+    chart.options = {
+        // get the chart dimensions from the container
+        width: options.width       || chart.base.node().parentNode.clientWidth
+      , height: options.height     || chart.base.node().parentNode.clientHeight
+
+      , name: options.name         || "name"
+      , value: options.value       || "value"
+      , duration: options.duration || 750
+
+    };
 
     chart._internalUpdate = false;
-
 
     chart.off("change:value").on("change:value", function() {
       chart.d3.layout.value(function(d) {
@@ -103,7 +116,7 @@ d3.chart("hierarchy", {
     chart.trigger("change:colors");
     if( chart.root ) { chart.draw(chart.root); }
 
-    return chart;    
+    return chart;
   },
 
 
@@ -154,6 +167,37 @@ d3.chart("hierarchy", {
 
     return chart;
   },
+
+
+  /* added */
+  data : function() {
+    return this.root;
+  },
+
+  with_tips : function(_){
+    var chart = this;
+    chart.tip = _;
+    return chart;
+  },
+
+/**
+  cfg : function(_) {
+    var chart = this
+    , p
+    ;
+    if( ! arguments.length ) { return chart.options; }
+
+    for (p in _) {
+      chart.options[p] = _[p];
+      chart.trigger('change:' + p );
+    }
+
+    if( chart.root ) { chart.draw(chart.root); }
+
+    return chart;
+  },
+*/
+/* end addition */
 
 
   // http://bl.ocks.org/robschmuecker/7926762

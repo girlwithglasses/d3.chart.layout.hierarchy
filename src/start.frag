@@ -1,5 +1,6 @@
 
 (function(global, factory) {
+
   "use strict";
 
   if( typeof global.define === "function" && global.define.amd ) {
@@ -11,4 +12,5 @@
   }
 
 })(this, function(window, d3) {
+
 "use strict";

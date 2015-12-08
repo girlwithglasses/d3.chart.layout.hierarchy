@@ -29,8 +29,8 @@ d3.chart("cluster-tree").extend("cluster-tree.cartesian", {
 
 
     chart.off("change:margin").on("change:margin", function() {
-      chart.options.width  = chart.base.attr("width")  - chart.options.margin.left - chart.options.margin.right;
-      chart.options.height = chart.base.attr("height") - chart.options.margin.top  - chart.options.margin.bottom;
+     chart.options.width  = chart.base.node().parentNode.clientWidth  - chart.options.margin.left - chart.options.margin.right;
+     chart.options.height = chart.base.node().parentNode.clientHeight - chart.options.margin.top  - chart.options.margin.bottom;
       chart.layers.base.attr("transform", "translate(" + chart.options.margin.left + "," + chart.options.margin.top + ")");
     });
 

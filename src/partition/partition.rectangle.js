@@ -3,7 +3,7 @@ d3.chart("hierarchy").extend("partition.rectangle", {
 
   initialize : function() {
     var chart = this;
-    
+
     chart.d3.layout = d3.layout.partition();
 
     var x = d3.scale.linear().range([0, chart.options.width]),
@@ -29,11 +29,11 @@ d3.chart("hierarchy").extend("partition.rectangle", {
           this.attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; });
 
           var kx = chart.options.width  / chart.root.dx,
-              ky = chart.options.height / 1; 
+              ky = chart.options.height / 1;
 
           this.append("rect")
             .attr("width", chart.root.dy * kx)
-            .attr("height", function(d) { return d.dx * ky; }); 
+            .attr("height", function(d) { return d.dx * ky; });
 
           this.append("text")
             .attr("transform", function(d) { return chart.d3.transform(d, ky); })
@@ -42,6 +42,12 @@ d3.chart("hierarchy").extend("partition.rectangle", {
             .text(function(d) { return d[chart.options.name]; });
 
           this.on("click", function(event) { chart.trigger("click:rect", event); });
+          // added!
+          if (chart.tip) {
+            this.on('mouseover', chart.tip.show);
+            this.on('mouseout', chart.tip.hide);
+          }
+//        end addition
         }
       }
     });
@@ -71,10 +77,11 @@ d3.chart("hierarchy").extend("partition.rectangle", {
     });
 
     function collapse(d) {
-      var kx = (d.y ? chart.options.width - 40 : chart.options.width) / (1 - d.y),
+      var offset = 40,
+          kx = (d.y ? chart.options.width - offset : chart.options.width) / (1 - d.y),
           ky = chart.options.height / d.dx;
 
-      x.domain([d.y, 1]).range([d.y ? 40 : 0, chart.options.width]);
+      x.domain([d.y, 1]).range([d.y ? offset : 0, chart.options.width]);
       y.domain([d.x, d.x + d.dx]);
 
       var t = chart.layers.base.transition()
@@ -93,7 +100,7 @@ d3.chart("hierarchy").extend("partition.rectangle", {
 
       node = d;
     }
-  
+
     return chart;
   },
 });

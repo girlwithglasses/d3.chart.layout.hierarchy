@@ -17,7 +17,9 @@ d3.chart("hierarchy").extend("cluster-tree", {
     chart.layer("nodes", chart.layers.nodes, {
 
       dataBind: function(nodes) {
-        return this.selectAll(".node").data(nodes, function(d) { return d._id || (d._id = ++counter); });
+        return this.selectAll(".node").data(nodes, function(d) {
+          return d._id || (d._id = ++counter);
+        });
       },
 
       insert: function() {
@@ -25,34 +27,36 @@ d3.chart("hierarchy").extend("cluster-tree", {
       },
 
       events: {
-        "enter": function() {
-          this.classed( "leaf", function(d) { return d.isLeaf; });
+        'update': function(){
+          this.classed( 'expandable', function(d){ return d._children; });
+        },
+
+        'enter': function() {
+          this.classed( 'leaf', function(d) { return d.isLeaf; });
+          this.classed( 'expandable', function(d){ return d._children; });
 
           this.append("circle")
             .attr("r", 0);
 
           this.append("text")
-            .attr("dy", ".35em")
+            .attr("dy", ".35rem")
             .text(function(d) { return d[chart.options.name]; })
             .style("fill-opacity", 0);
 
 
           this.on("click", function(event) { chart.trigger("click:node", event); });
         },
-/*
-        "merge": function() {
+
+        'merge': function() {
           // Set additional node classes as they may change during manipulations
           // with data. For example, a node is added to another leaf node, so
           // ex-leaf node should change its class from node-leaf to node-parent.
           this.classed( "leaf", function(d) { return d.isLeaf; });
-
-          // Function .classed() is not available in transition events.
-          this.classed( "collapsible", function(d) { return d._children !== undefined; });
+          this.classed( 'expandable', function(d){ return d._children; });
         },
-*/
-        "merge:transition": function() {
+
+        'merge:transition': function() {
           this.select("circle")
-            .attr()
             .attr("r", chart.options.radius);
 
           this.select("text")
@@ -77,7 +81,9 @@ d3.chart("hierarchy").extend("cluster-tree", {
 
       dataBind: function(nodes) {
         return this.selectAll(".link")
-          .data(chart.d3.layout.links(nodes), function(d) { return d.target._id; });
+          .data(chart.d3.layout.links(nodes), function(d) {
+            return d.target._id;
+          });
       },
 
       insert: function() {
@@ -110,8 +116,6 @@ d3.chart("hierarchy").extend("cluster-tree", {
     });
 
   },
-
-
 
   transform: function(nodes) {
     var chart = this;
@@ -163,11 +167,11 @@ d3.chart("hierarchy").extend("cluster-tree", {
   },
 
 
-  /**
-   * Sets a gap between node levels. Acceps eithe number of pixels or string
+  /** Y axis scaling
+   * Sets a gap between node levels. Accepts either number of pixels or string
    * "auto". When level gap set to "auto", gap between node levels will be
    * maximized, so the tree takes full width.
-   * 
+   *
    * @author: Basil Gren @basgren
    *
    * @param _

@@ -78,6 +78,8 @@ module.exports = function(grunt) {
             "src/partition/partition.rectangle.js",
             "src/treemap/treemap.js",
 
+            "src/hierarchy/diagonal.js",
+
             "src/end.frag"
           ]
         }
@@ -101,7 +103,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-uglify");
   grunt.loadNpmTasks("grunt-contrib-watch");
 
-  grunt.registerTask("default", ["concat"]);
+  grunt.registerTask("default", ["jshint", "concat"]);
   grunt.registerTask("release", ["jshint", "concat", "uglify"]);
 };
 
