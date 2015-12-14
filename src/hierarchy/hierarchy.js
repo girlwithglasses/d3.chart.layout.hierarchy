@@ -33,14 +33,24 @@ d3.chart("hierarchy", {
       , height: options.height     || chart.base.node().parentNode.clientHeight
 
       , name: options.name         || "name"
-      , value: options.value       || "value"
+//    , value: options.value       || "value"
       , duration: options.duration || 750
 
     };
 
+//     ['zoomable'].map(function(f){
+//       if (options.hasOwnProperty(f) ) {
+//         chart[ f ]( options[ f ] );
+//       }
+//     });
+
     chart._internalUpdate = false;
 
     chart.off("change:value").on("change:value", function() {
+      if (! chart.d3 || ! chart.d3.layout ) {
+        console.log('Layout not set yet, cannot use value');
+        return;
+      }
       chart.d3.layout.value(function(d) {
         return chart.options.value === "_COUNT_" ? 1 : d[chart.options.value];
       });
@@ -198,7 +208,6 @@ d3.chart("hierarchy", {
   },
 */
 /* end addition */
-
 
   // http://bl.ocks.org/robschmuecker/7926762
   _walker: function(parent, walkerFunction, childrenFunction) {
