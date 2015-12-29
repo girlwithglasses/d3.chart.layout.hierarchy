@@ -1,76 +1,31 @@
-/* adapted from kueda's d3.phylogram.js */
+/*jshint laxcomma: true */
+/* global d3 */
+  'use strict';
 
-d3.svg.diagonal.rightAngle = function(){
+/** adapted from kueda's d3.phylogram.js */
 
-  var diagonal = function (d, i) {
-
-    var pathFn = this.path_lib[ this.path_type ]
-      , pathData = pathFn(d);
-    pathData = pathData.map(d3.svg.diagonal.projection);
-    return this.path(pathData)
-  }
-  , path_lib = {
-      vert_horiz: function(p){
-        return [ p.source,{ x: p.target.x, y: p.source.y}, p.target ];
-      },
-
-      horiz_vert: function(p){
-        return [ p.source,{ x: p.source.x, y: p.target.y}, p.target ];
-      },
-
-      dogleg: function(p){
-        return [ p.source,
-        {   x: p.source.x,
-            y: (p.source.y + p.target.y) / 2
-        },
-        {   x: (p.source.x + p.target.x) / 2,
-            y: (p.source.y + p.target.y) / 2
-        },
-        {   x: p.target.x,
-            y: (p.source.y + p.target.y) / 2
-        }, p.target];
-      },
-
-      vertical_dogleg: function(p){
-        return [ p.source,
-        {   x: (p.source.x + p.target.x) / 2,
-            y: p.source.y
-        },
-        {   x: (p.source.x + p.target.x) / 2,
-            y: (p.source.y + p.target.y) / 2
-        },
-        {   x: (p.source.x + p.target.x) / 2,
-            y: p.target.y
-        }, p.target];
-      },
-  }
-  , path = function( pathData) {
-    return 'M' + pathData.join(' ');
-  }
-  , path_type = function(_) {
-      if (! arguments.length) return this.path_type || 'dogleg';
-      this.path_type = _;
-      return this.diagonal;
-  }
-};
-
-d3.phylogram = {
+d3.svg.diagonal_extras = {
     // helper function for getting types
     _get_type: function(elem) {
       return Object.prototype.toString.call(elem).slice(8, -1);
-    },
+    }
 
+    , path: {
+      // diagonal line
+      direct: function(p){
+        return [ p.source, p.target ];
+      }
 
-    path: {
-      vert_horiz: function(p){
-        return [ p.source,{ x: p.target.x, y: p.source.y}, p.target ];
-      },
+      // this is also the default path in radial trees
+      , l_shape: function(p){
+        return [ p.source, { x: p.target.x, y: p.source.y }, p.target ];
+      }
 
-      horiz_vert: function(p){
-        return [ p.source,{ x: p.source.x, y: p.target.y}, p.target ];
-      },
+      , l_shape_2: function(p){
+        return [ p.source, { x: p.source.x, y: p.target.y }, p.target ];
+      }
 
-      dogleg: function(p){
+      , dogleg: function(p){
         return [ p.source,
         {   x: p.source.x,
             y: (p.source.y + p.target.y) / 2
@@ -81,9 +36,9 @@ d3.phylogram = {
         {   x: p.target.x,
             y: (p.source.y + p.target.y) / 2
         }, p.target];
-      },
+      }
 
-      vertical_dogleg: function(p){
+      , dogleg_2: function(p){
         return [ p.source,
         {   x: (p.source.x + p.target.x) / 2,
             y: p.source.y
@@ -94,36 +49,38 @@ d3.phylogram = {
         {   x: (p.source.x + p.target.x) / 2,
             y: p.target.y
         }, p.target];
-      },
-
-      radial: function(p) {
-        return [ p.source,{ x: p.target.x, y: p.source.y }, p.target ];
       }
 
     }
-    ,
-    rightAngleDiagonal: function() {
-      var projection = function(d) { return [d.y, d.x]; }
+
+    , right_angle: function() {
+
+      var projection = d3.svg.diagonal().projection()
 
       , path = function(pathData) {
         return "M" + pathData.join(' ');
       }
-      , valid_path_types = function() {
-        return Object.keys( d3.phylogram.path );
-      }
       , path_type = 'dogleg'
-      ;
 
-      function diagonal(d, i) {
-        var pathData = d3.phylogram.path[ path_type ](d);
-        pathData = pathData.map(projection);
-        console.log('path data now: ' + pathData);
-        return path(pathData)
+      , path_maker = function( pathData ) {
+        return "M" + pathData.map( projection ).join(' ');
+      };
+
+      function diagonal(d) {
+        return diagonal.path_maker( d3.svg.diagonal_extras.path[ diagonal.path_type() ](d) );
       }
+
+      diagonal.path_maker = function( pathData ) {
+        return "M" + pathData.map( projection ).join(' ');
+      };
+
+      diagonal.valid_path_types = function() {
+        return Object.keys( d3.svg.diagonal_extras.path );
+      };
 
       diagonal.path_type = function(x) {
-        if (! arguments.length) return path_type;
-        if ( d3.phylogram.path[ x ] ) {
+        if (! arguments.length) { return path_type; }
+        if ( d3.svg.diagonal_extras.path[ x ] ) {
           path_type = x;
           return diagonal;
         }
@@ -131,246 +88,86 @@ d3.phylogram = {
       };
 
       diagonal.projection = function(x) {
-        if (!arguments.length) return projection;
+        if (!arguments.length) { return projection; }
         projection = x;
         return diagonal;
       };
 
       diagonal.path = function(x) {
-        if (!arguments.length) return path;
+        if (!arguments.length) { return path; }
         path = x;
         return diagonal;
       };
 
       return diagonal;
     }
-    ,
-    radialRightAngleDiagonal: function() {
 
-      return d3.phylogram.rightAngleDiagonal()
-        .path_type( 'radial' )
-        .projection(function(d) {
-          var r = d.y, a = (d.x - 90) / 180 * Math.PI;
-          return [r * Math.cos(a), r * Math.sin(a)];
-        })
-        .path( function(pathData) {
-          var src = pathData[0],
-              mid = pathData[1],
-              dst = pathData[2],
-              radius = Math.sqrt(src[0]*src[0] + src[1]*src[1]),
-              srcAngle = d3.phylogram.coordinateToAngle(src, radius),
-              midAngle = d3.phylogram.coordinateToAngle(mid, radius),
-              clockwise = Math.abs(midAngle - srcAngle) > Math.PI ? midAngle <= srcAngle : midAngle > srcAngle,
-              rotation = 0,
-              largeArc = 0,
-              sweep = clockwise ? 0 : 1;
+    , radial: function() {
 
-          return 'M' + [ src
-            , 'A' + [radius,radius]
-            , rotation
-            , largeArc + ',' + sweep
-            , mid + 'L' + dst ].join(' ');
-        })
-    }
-    ,
-  // Convert XY and radius to angle of a circle centered at 0,0
-    coordinateToAngle: function(coord, radius) {
-      var wholeAngle = 2 * Math.PI
-      , quarterAngle = wholeAngle / 4
-      , coordQuad = coord[0] >= 0 ? (coord[1] >= 0 ? 1 : 2) : (coord[1] >= 0 ? 4 : 3)
-      , coordBaseAngle = Math.abs(Math.asin(coord[1] / radius))
-      , coordAngle
+      var diagonal = d3.svg.diagonal_extras.right_angle()
+
+      , projection = function(pt){
+        return [ pt.x, pt.y ];
+      }
+
+      , polar_obj_to_cart = function(pt){
+          var angle = pt.x / 180 * Math.PI;
+          return [pt.y * Math.cos(angle), pt.y * Math.sin(angle)];
+      }
+      , polar_coords_to_cart = function(xy){
+          var angle = xy[0] / 180 * Math.PI;
+          return [ xy[1] * Math.cos(angle), xy[1] * Math.sin(angle)];
+      }
       ;
 
-      // Since this is just based on the angle of the right triangle formed
-      // by the coordinate and the origin, each quad will have different
-      // offsets
-      switch (coordQuad) {
-        case 1:
-          coordAngle = quarterAngle - coordBaseAngle
-          break
-        case 2:
-          coordAngle = quarterAngle + coordBaseAngle
-          break
-        case 3:
-          coordAngle = 2*quarterAngle + quarterAngle - coordBaseAngle
-          break
-        case 4:
-          coordAngle = 3*quarterAngle + coordBaseAngle
-      }
-      return coordAngle;
-    }
-//     maxLength: function( d ){
-//       return d.length + (d.children ? d3.max(d.children, maxLength) : 0);
-//     }
-//     ,
-//
-//     calcYscale: function( root, chart ){
-//       var yScale = d3.scale.linear()
-//         .domain([0, d3.phylogram.maxLength( root )])
-//         .range ([0, chart.options.width ]);
-//
-//       setYscale( root, 0, yScale );
-//
-//       return yScale;
-//     }
-//     ,
-//
-//     setYscale: function( d, offset, yScale ){
-//       d.y = (offset += d.length) * yScale;
-//       if (d.children) d.children.forEach(function(d) { setRadius(d, offset, yScale); });
-//     }
+      diagonal.path_type('direct');
 
+      diagonal.projection = function(x) {
+        if (!arguments.length) { return projection; }
+        projection = x;
+        return diagonal;
+      };
+
+      diagonal.path_maker = function( pathData ) {
+
+        var projected = pathData.map( function(x){ return projection(x); })
+        , pl = projected.length
+        , points
+        , prev_angle
+        ;
+
+        // direct link:
+        if ( 2 === pl ) {
+          return 'M' + projected.map( function(x){ return polar_coords_to_cart(x); }).join(' ');
+        }
+
+//         if ( projected[0].x === projected[ pl-1 ].x && projected[0].y === projected[ pl-1 ].y) {
+//           return 'M' + polar_coords_to_cart( projected[0] ) + ' ' + polar_coords_to_cart( projected[ pl-1 ] );
+//         }
+
+        points = projected.map( function(obj){
+          return { angle: obj[0] / 180 * Math.PI, radius: obj[1] };
+        });
+
+        return "M" + points.map( function(pt){
+          var str = '';
+          if ( prev_angle ) {
+            if ( prev_angle === pt.angle ) {
+              // draw a straight line
+              str = 'L';
+            }
+            else {
+              // draw an arc to the new radius and angle
+              str = 'A' + pt.radius + ',' + pt.radius + " 0 0 "
+              + (pt.angle > prev_angle ? 1 : 0) + " ";
+            }
+          }
+          prev_angle = pt.angle;
+          return str + pt.radius * Math.cos(pt.angle) + "," + pt.radius * Math.sin(pt.angle);
+
+        }).join(' ');
+
+      };
+      return diagonal;
+    }
 };
-
-/**
-
-var outerRadius = 960 / 2,
-    innerRadius = outerRadius - 170;
-
-  setRadius(root, root.length = 0, innerRadius / maxLength(root));
-
-
-// Compute the maximum cumulative length of any node in the tree.
-function maxLength(d) {
-  return d.length + (d.children ? d3.max(d.children, maxLength) : 0);
-}
-
-// Set the radius of each node by recursively summing and scaling the distance from the root.
-function setRadius(d, y0, k) {
-  d.radius = (y0 += d.length) * k;
-  if (d.children) d.children.forEach(function(d) { setRadius(d, y0, k); });
-}
-
-
-  function scaleBranchLengths(nodes, w) {
-    // Visit all nodes and adjust y pos width distance metric
-    var visitPreOrder = function(root, callback) {
-      callback(root)
-      if (root.children) {
-        for (var i = root.children.length - 1; i >= 0; i--){
-          visitPreOrder(root.children[i], callback)
-        };
-      }
-    }
-    , rootDists
-    , yScale;
-    visitPreOrder(nodes[0], function(node) {
-      node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0)
-    });
-    rootDists = nodes.map(function(n) { return n.rootDist; });
-    yScale = d3.scale.linear()
-      .domain([0, d3.max(rootDists)])
-      .range([0, w]);
-    visitPreOrder(nodes[0], function(node) {
-      node.y = yScale(node.rootDist)
-    });
-    return yScale;
-  };
-
-    if (options.skipBranchLengthScaling) {
-      var yScale = d3.scale.linear()
-        .domain([0, w])
-        .range([0, w]);
-    } else {
-      var yScale = scaleBranchLengths(nodes, w)
-    }
-
-*/
-
-d3.chart('cluster-tree.cartesian').extend('cluster-tree.cartesian.diagonal', {
-  diagonal: function(_) {
-    var chart = this;
-    if( ! arguments.length ) { return chart.options.diagonal; }
-
-    chart.d3.diagonal = d3.phylogram.rightAngleDiagonal();
-
-    if( _ === "rightAngle" ) {
-      _ = 'dogleg';
-    }
-    // set the path type. Will throw an error if invalid.
-    // we should really propagate the error and die nicely...
-    chart.d3.diagonal.path_type( _ );
-
-    chart.trigger("change:diagonal");
-
-    if( chart.root ){ chart.draw(chart.root); }
-
-    return chart;
-  },
-  initialize: function(){
-		console.log('running initialize');
-    var chart = this;
-    chart.d3.diagonal = chart.options.diagonal || d3.svg.diagonal().projection(function(d) { return [d.y, d.x]; });
-  }
-});
-
-d3.chart("cluster-tree.cartesian.diagonal").extend("cluster.cartesian.diagonal", {
-  initialize : function() {
-		console.log('running initialize');
-    this.d3.layout = d3.layout.cluster();
-  }
-});
-
-d3.chart('cluster-tree.cartesian.diagonal').extend('tree.cartesian.diagonal',{
-  initialize: function() {
-		console.log('running initialize');
-    this.d3.layout = d3.layout.cluster()
-        .size([this.options.height, this.options.width])
-        .separation( function(a,b) {return 1} )
-        .sort(function(node) {
-          return node.children ? node.children.length : -1;
-        })
-        ;
-  }
-});
-
-d3.chart('cluster-tree.radial').extend('cluster-tree.radial.diagonal', {
-  diagonal: function(_) {
-    var chart = this;
-    if( ! arguments.length ) { return chart.options.diagonal; }
-
-    if( _ === "rightAngle" || _ === "rightAngleRadial") {
-      chart.d3.diagonal = d3.phylogram.radialRightAngleDiagonal();
-      chart.duration( 0 );
-    } else {
-      console.log('Invalid argument for diagonal');
-    }
-
-    chart.trigger("change:diagonal");
-
-    if( chart.root ){ chart.draw(chart.root); }
-
-    return chart;
-  },
-  initialize: function() {
-		console.log('running initialize');
-    var chart = this;
-    chart.d3.diagonal = chart.options.diagonal || d3.svg.diagonal.radial().projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
-  }
-});
-
-
-d3.chart("cluster-tree.radial.diagonal").extend("cluster.radial.diagonal", {
-  initialize : function() {
-		console.log('running initialize');
-    this.d3.layout = d3.layout.cluster();
-  }
-});
-
-
-d3.chart('cluster-tree.radial.diagonal').extend('tree.radial.diagonal',{
-  initialize: function() {
-		console.log('running initialize');
-    this.d3.layout = d3.layout.cluster()
-        .size([this.options.height, this.options.width])
-        .separation( function(a,b) {return 1} )
-        .sort(function(node) {
-          return node.children ? node.children.length : -1;
-        })
-        ;
-  }
-});
-
-
-
